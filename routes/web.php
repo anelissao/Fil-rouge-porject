@@ -59,7 +59,7 @@ Route::middleware(['auth'])->group(function () {
             if (Auth::user()->role !== 'student') {
                 return redirect('/')->with('error', 'Only students can access this area.');
             }
-            return view('submissions.index');
+            return view('student.submissions.index');
         })->name('submissions.index');
 
         Route::get('/submissions/create', function() {
@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
             if (Auth::user()->role !== 'student') {
                 return redirect('/')->with('error', 'Only students can access this area.');
             }
-            return view('submissions.create');
+            return view('student.submissions.create');
         })->name('submissions.create');
 
         // Evaluations
@@ -76,7 +76,7 @@ Route::middleware(['auth'])->group(function () {
             if (Auth::user()->role !== 'student') {
                 return redirect('/')->with('error', 'Only students can access this area.');
             }
-            return view('evaluations.index');
+            return view('student.evaluations.index');
         })->name('evaluations.index');
     });
 

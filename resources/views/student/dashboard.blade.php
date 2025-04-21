@@ -60,7 +60,7 @@
                                     <div>
                                         <h3 class="font-medium">{{ $brief->title }}</h3>
                                         <p class="text-sm text-gray-500">
-                                            Due: {{ $brief->deadline->format('M d, Y') }}
+                                            Due: {{ $brief->end_date->format('M d, Y') }}
                                         </p>
                                     </div>
                                     <div class="flex space-x-2">
@@ -69,7 +69,7 @@
                                         @else
                                             <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Pending</span>
                                         @endif
-                                        <a href="{{ route('brief.show', $brief->id) }}" class="text-blue-600 hover:underline text-sm">View</a>
+                                        <a href="{{ route('briefs.show', $brief->id) }}" class="text-blue-600 hover:underline text-sm">View</a>
                                     </div>
                                 </div>
                             </li>
@@ -80,7 +80,7 @@
                 @endif
             </div>
             <div class="card-footer">
-                <a href="{{ route('briefs') }}" class="text-blue-600 hover:underline">View all briefs</a>
+                <a href="{{ route('briefs.index') }}" class="text-blue-600 hover:underline">View all briefs</a>
             </div>
         </div>
 
@@ -107,7 +107,7 @@
                                         @else
                                             <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Pending</span>
                                         @endif
-                                        <a href="{{ route('student.evaluation.show', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">Evaluate</a>
+                                        <a href="{{ route('student.evaluations.edit', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">Evaluate</a>
                                     </div>
                                 </div>
                             </li>
@@ -118,7 +118,7 @@
                 @endif
             </div>
             <div class="card-footer">
-                <a href="{{ route('student.evaluations') }}" class="text-blue-600 hover:underline">View all evaluations</a>
+                <a href="{{ route('student.evaluations.index') }}" class="text-blue-600 hover:underline">View all evaluations</a>
             </div>
         </div>
 
@@ -140,7 +140,7 @@
                                         </p>
                                     </div>
                                     <div>
-                                        <a href="{{ route('student.result.show', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">View Results</a>
+                                        <a href="{{ route('student.evaluations.show', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">View Results</a>
                                     </div>
                                 </div>
                             </li>
@@ -151,7 +151,7 @@
                 @endif
             </div>
             <div class="card-footer">
-                <a href="{{ route('student.results') }}" class="text-blue-600 hover:underline">View all results</a>
+                <a href="{{ route('student.evaluations.index') }}" class="text-blue-600 hover:underline">View all results</a>
             </div>
         </div>
 
@@ -162,19 +162,19 @@
             </div>
             <div class="card-body">
                 <div class="grid grid-cols-1 gap-3">
-                    <a href="{{ route('briefs') }}" class="action-link">
+                    <a href="{{ route('briefs.index') }}" class="action-link">
                         <i class="fas fa-book"></i>
                         <span>View All Briefs</span>
                     </a>
-                    <a href="{{ route('student.submissions') }}" class="action-link">
+                    <a href="{{ route('student.submissions.index') }}" class="action-link">
                         <i class="fas fa-file-upload"></i>
                         <span>My Submissions</span>
                     </a>
-                    <a href="{{ route('student.evaluations') }}" class="action-link">
+                    <a href="{{ route('student.evaluations.index') }}" class="action-link">
                         <i class="fas fa-clipboard-check"></i>
                         <span>My Evaluations</span>
                     </a>
-                    <a href="{{ route('student.results') }}" class="action-link">
+                    <a href="{{ route('student.evaluations.index') }}" class="action-link">
                         <i class="fas fa-award"></i>
                         <span>View My Results</span>
                     </a>
