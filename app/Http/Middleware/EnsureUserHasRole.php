@@ -5,32 +5,34 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-class CheckRole
+class EnsureUserHasRole
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  string|array  $roles
+     * @param  string  $role
      * @return mixed
      */
-    public function handle(Request $request, Closure $next, $roles)
+    public function handle(Request $request, Closure $next, $role)
     {
+        // Log attempt to use the middleware
+        Log::info('EnsureUserHasRole middleware executed', [
+            'role_required' => $role,
+            'user_authenticated' => Auth::check(),
+            'user_role' => Auth::check() ? Auth::user()->role : 'none'
+        ]);
+        
         if (!Auth::check()) {
             return redirect('login');
         }
 
         $user = Auth::user();
         
-        // If roles is a pipe separated string, convert it to array
-        if (!is_array($roles)) {
-            $roles = explode('|', $roles);
-        }
-        
-        // Check if user's role is in the allowed roles
-        if (in_array($user->role, $roles)) {
+        if ($user->role === $role) {
             return $next($request);
         }
         

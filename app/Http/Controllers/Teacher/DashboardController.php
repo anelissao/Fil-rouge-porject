@@ -14,6 +14,24 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware(function ($request, $next) {
+            // Check if the user is a teacher
+            if (Auth::user()->role !== 'teacher') {
+                return redirect('/')->with('error', 'You must be a teacher to access this page.');
+            }
+            
+            return $next($request);
+        });
+    }
+    
+    /**
      * Display the teacher dashboard with relevant statistics and data.
      *
      * @return \Illuminate\View\View

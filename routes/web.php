@@ -63,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Teacher-specific routes
-    Route::middleware(['auth', 'role:teacher'])->prefix('teacher')->name('teacher.')->group(function () {
+    Route::middleware(['auth'])->prefix('teacher')->name('teacher.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [App\Http\Controllers\Teacher\DashboardController::class, 'index'])->name('dashboard');
 
