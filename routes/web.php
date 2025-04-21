@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\BriefController;
 use Illuminate\Support\Facades\Auth;
 
 // Public routes
@@ -42,9 +43,8 @@ Route::middleware(['auth'])->group(function () {
     })->name('profile.show');
 
     // Brief routes (accessible by both teachers and students)
-    Route::get('/briefs', function() {
-        return view('briefs.index');
-    })->name('briefs.index');
+    Route::get('/briefs', [BriefController::class, 'index'])->name('briefs.index');
+    Route::get('/briefs/{id}', [BriefController::class, 'show'])->name('briefs.show');
 
     // Student-specific routes
     Route::middleware(['auth'])->group(function () {
