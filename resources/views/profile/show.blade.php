@@ -44,7 +44,7 @@
                                 @endif
 
                                 @if($user->isStudent())
-                                    <a href="{{ route('submissions.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 ms-2">
+                                    <a href="{{ route('student.submissions.index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 ms-2">
                                         <i class="fas fa-upload me-1"></i> My Submissions
                                     </a>
                                 @endif

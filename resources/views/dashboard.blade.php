@@ -186,13 +186,13 @@
                     </div>
                     <h3 class="action-title">View Briefs</h3>
                 </a>
-                <a href="{{ route('submissions.create') }}" class="action-card">
+                <a href="{{ route('student.submissions.create') }}" class="action-card">
                     <div class="action-icon">
                         <i class="fas fa-upload"></i>
                     </div>
                     <h3 class="action-title">New Submission</h3>
                 </a>
-                <a href="{{ route('evaluations.index') }}" class="action-card">
+                <a href="{{ route('student.evaluations.index') }}" class="action-card">
                     <div class="action-icon">
                         <i class="fas fa-clipboard-check"></i>
                     </div>
