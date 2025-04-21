@@ -58,21 +58,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
         
         // Submissions
-        Route::get('/submissions', function() {
-            // Check if user is student
-            if (Auth::user()->role !== 'student') {
-                return redirect('/')->with('error', 'Only students can access this area.');
-            }
-            return view('student.submissions.index');
-        })->name('submissions.index');
-
-        Route::get('/submissions/create', function() {
-            // Check if user is student
-            if (Auth::user()->role !== 'student') {
-                return redirect('/')->with('error', 'Only students can access this area.');
-            }
-            return view('student.submissions.create');
-        })->name('submissions.create');
+        Route::get('/submissions', [App\Http\Controllers\Student\SubmissionController::class, 'index'])->name('submissions.index');
+        Route::get('/submissions/create', [App\Http\Controllers\Student\SubmissionController::class, 'create'])->name('submissions.create');
+        Route::post('/submissions', [App\Http\Controllers\Student\SubmissionController::class, 'store'])->name('submissions.store');
+        Route::get('/submissions/{submission}', [App\Http\Controllers\Student\SubmissionController::class, 'show'])->name('submissions.show');
+        Route::get('/submissions/{submission}/download', [App\Http\Controllers\Student\SubmissionController::class, 'download'])->name('submissions.download');
 
         // Evaluations
         Route::get('/evaluations', function() {

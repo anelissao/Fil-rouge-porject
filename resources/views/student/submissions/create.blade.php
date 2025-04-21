@@ -22,7 +22,7 @@
                             <span class="font-medium">Teacher:</span> {{ $brief->teacher->username }}
                         </div>
                         <div>
-                            <span class="font-medium">Deadline:</span> {{ $brief->end_date->format('M d, Y') }}
+                            <span class="font-medium">Deadline:</span> {{ $brief->deadline ? $brief->deadline->format('M d, Y') : 'No deadline' }}
                         </div>
                     </div>
                     
