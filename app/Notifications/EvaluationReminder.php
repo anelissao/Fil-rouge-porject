@@ -7,26 +7,27 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\Models\Evaluation;
-use Carbon\Carbon;
 
 class EvaluationReminder extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * The evaluation instance.
+     *
+     * @var \App\Models\Evaluation
+     */
     protected $evaluation;
-    protected $daysRemaining;
 
     /**
      * Create a new notification instance.
      *
-     * @param Evaluation $evaluation
-     * @param int $daysRemaining
+     * @param  \App\Models\Evaluation  $evaluation
      * @return void
      */
-    public function __construct(Evaluation $evaluation, $daysRemaining)
+    public function __construct(Evaluation $evaluation)
     {
         $this->evaluation = $evaluation;
-        $this->daysRemaining = $daysRemaining;
     }
 
     /**
@@ -48,34 +49,24 @@ class EvaluationReminder extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $submitter = $this->evaluation->submission->user;
         $brief = $this->evaluation->submission->brief;
-        $dueDate = $this->evaluation->due_date;
-        
-        $urgencyLevel = $this->daysRemaining <= 1 ? 'high' : 'medium';
-        $urgencyText = $this->daysRemaining <= 1 ? 'Urgent: ' : '';
+        $dueDate = $this->evaluation->due_at ? $this->evaluation->due_at->format('F j, Y') : 'soon';
+        $daysLeft = $this->evaluation->due_at ? $this->evaluation->due_at->diffInDays(now()) : null;
         
         $mailMessage = (new MailMessage)
-            ->subject($urgencyText . 'Reminder: Evaluation Due Soon - ' . $brief->title)
+            ->subject('Reminder: Evaluation Due ' . ($daysLeft ? "in $daysLeft days" : 'Soon'))
             ->greeting('Hello ' . $notifiable->first_name . ',')
-            ->line('This is a reminder that your evaluation is due soon.')
-            ->line('**Brief**: ' . $brief->title)
-            ->line('**Submission by**: ' . $submitter->username);
-            
-        if ($this->daysRemaining <= 0) {
-            $mailMessage->line('**Status**: This evaluation is now overdue.');
-        } else {
-            $daysText = $this->daysRemaining == 1 ? '1 day' : $this->daysRemaining . ' days';
-            $mailMessage->line('**Time Remaining**: ' . $daysText);
-        }
+            ->line('This is a reminder that you have an evaluation due for "' . $brief->title . '".');
         
-        if ($dueDate) {
-            $mailMessage->line('**Due Date**: ' . $dueDate->format('F j, Y'));
+        if ($daysLeft !== null) {
+            $mailMessage->line('Your evaluation is due on ' . $dueDate . ' (' . $daysLeft . ' days remaining).');
+        } else {
+            $mailMessage->line('Please complete this evaluation as soon as possible.');
         }
         
         return $mailMessage
             ->action('Complete Evaluation', route('student.evaluations.edit', $this->evaluation->id))
-            ->line('Please complete your evaluation as soon as possible.');
+            ->line('Thank you for your participation in the peer evaluation process!');
     }
 
     /**
@@ -84,30 +75,17 @@ class EvaluationReminder extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toDatabase($notifiable)
+    public function toArray($notifiable)
     {
-        $submitter = $this->evaluation->submission->user;
         $brief = $this->evaluation->submission->brief;
-        
-        $urgencyLevel = $this->daysRemaining <= 1 ? 'high' : 'medium';
-        
-        if ($this->daysRemaining <= 0) {
-            $message = 'Your evaluation for "' . $brief->title . '" is now overdue.';
-        } else {
-            $daysText = $this->daysRemaining == 1 ? '1 day' : $this->daysRemaining . ' days';
-            $message = 'Your evaluation for "' . $brief->title . '" is due in ' . $daysText . '.';
-        }
+        $daysLeft = $this->evaluation->due_at ? $this->evaluation->due_at->diffInDays(now()) : null;
         
         return [
             'evaluation_id' => $this->evaluation->id,
             'brief_id' => $brief->id,
             'brief_title' => $brief->title,
-            'submitter_username' => $submitter->username,
-            'due_date' => $this->evaluation->due_date ? $this->evaluation->due_date->format('Y-m-d') : null,
-            'days_remaining' => $this->daysRemaining,
-            'urgency' => $urgencyLevel,
-            'message' => $message,
-            'url' => route('student.evaluations.edit', $this->evaluation->id)
+            'message' => 'Reminder: You have an evaluation due ' . ($daysLeft ? "in $daysLeft days" : 'soon') . ' for "' . $brief->title . '".',
+            'due_at' => $this->evaluation->due_at,
         ];
     }
 } 

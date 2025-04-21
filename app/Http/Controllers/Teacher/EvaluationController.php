@@ -195,4 +195,68 @@ class EvaluationController extends Controller
             return back()->with('error', 'An error occurred while creating random assignments: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Show evaluation details for a specific student.
+     *
+     * @param  int  $id
+     * @param  int  $student_id
+     * @return \Illuminate\View\View
+     */
+    public function showStudentEvaluation($id, $student_id)
+    {
+        $teacher = Auth::user();
+        
+        // Get the evaluation and ensure it belongs to a brief created by this teacher
+        $evaluation = Evaluation::whereHas('submission.brief', function($query) use ($teacher) {
+            $query->where('teacher_id', $teacher->id);
+        })
+        ->with(['evaluator:id,username,first_name,last_name', 
+                'submission.student:id,username,first_name,last_name', 
+                'submission.brief:id,title,description',
+                'answers.criterion'])
+        ->where('id', $id)
+        ->firstOrFail();
+        
+        // Check if the student is either the evaluator or the submission's student
+        if ($evaluation->evaluator_id != $student_id && $evaluation->submission->student_id != $student_id) {
+            return redirect()->back()->with('error', 'This student is not associated with this evaluation.');
+        }
+        
+        // Check if this is the evaluator's view or the student being evaluated
+        $isEvaluator = $evaluation->evaluator_id == $student_id;
+        
+        return view('teacher.evaluations.student_view', compact('evaluation', 'isEvaluator'));
+    }
+
+    /**
+     * Show the details of a specific evaluation.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $teacher = Auth::user();
+        
+        // Get the evaluation and ensure it belongs to a brief created by this teacher
+        $evaluation = Evaluation::whereHas('submission.brief', function($query) use ($teacher) {
+            $query->where('teacher_id', $teacher->id);
+        })
+        ->with([
+            'evaluator:id,username,first_name,last_name', 
+            'submission.student:id,username,first_name,last_name', 
+            'submission.brief:id,title,description',
+            'answers.criterion'
+        ])
+        ->findOrFail($id);
+        
+        // Get other students who could be assigned as evaluators
+        $potentialEvaluators = User::where('role', 'student')
+            ->where('id', '!=', $evaluation->submission->student_id)
+            ->where('id', '!=', $evaluation->evaluator_id)
+            ->get();
+        
+        return view('teacher.evaluations.show', compact('evaluation', 'potentialEvaluators'));
+    }
 } 

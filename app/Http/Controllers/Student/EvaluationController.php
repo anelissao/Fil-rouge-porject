@@ -5,20 +5,16 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Brief;
-use App\Models\Submission;
 use App\Models\Evaluation;
+use App\Models\Submission;
 use App\Models\EvaluationAnswer;
 use App\Models\Feedback;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\EvaluationCompleted;
-use App\Notifications\EvaluationAssigned;
 
 class EvaluationController extends Controller
 {
     /**
-     * Display a listing of evaluations assigned to the student.
+     * Display a listing of the evaluations assigned to the student.
      *
      * @return \Illuminate\View\View
      */
@@ -30,40 +26,43 @@ class EvaluationController extends Controller
             return redirect('/')->with('error', 'You must be a student to access this page.');
         }
         
-        // Evaluations the student needs to perform
-        $assignedEvaluations = Evaluation::where('evaluator_id', $student->id)
-            ->with([
-                'submission.brief:id,title,end_date',
-                'submission.user:id,username,first_name,last_name',
-            ])
+        // Get evaluations assigned to the student
+        $evaluations = Evaluation::where('evaluator_id', $student->id)
+            ->with(['submission.brief', 'submission.student'])
             ->orderBy('status')
             ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        // Calculate if evaluations are overdue
+        $now = Carbon::now();
+        foreach ($evaluations as $evaluation) {
+            $evaluation->is_overdue = false;
+            if (!empty($evaluation->due_at) && $evaluation->status !== 'completed') {
+                $evaluation->is_overdue = Carbon::parse($evaluation->due_at)->isPast();
+            }
+        }
+        
+        // Get evaluations assigned to the student (duplicate of above, kept for view compatibility)
+        $assignedEvaluations = Evaluation::where('evaluator_id', $student->id)
+            ->where('status', '!=', 'completed')
+            ->with(['submission.brief', 'submission.student'])
+            ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'assigned_page');
-        
-        // Map to add overdue flag
-        $assignedEvaluations->getCollection()->transform(function ($evaluation) {
-            $evaluation->is_overdue = $evaluation->due_date && $evaluation->due_date->isPast();
-            return $evaluation;
-        });
-        
-        // Evaluations received on the student's submissions
-        $receivedEvaluations = Evaluation::whereHas('submission', function ($query) use ($student) {
-                $query->where('user_id', $student->id);
+            
+        // Get evaluations received on the student's submissions
+        $receivedEvaluations = Evaluation::whereHas('submission', function($query) use ($student) {
+                $query->where('student_id', $student->id);
             })
-            ->with([
-                'evaluator:id,username,first_name,last_name',
-                'submission.brief:id,title',
-                'feedback',
-            ])
+            ->with(['submission.brief', 'evaluator'])
             ->orderBy('status')
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'received_page');
         
-        return view('student.evaluations.index', compact('assignedEvaluations', 'receivedEvaluations'));
+        return view('student.evaluations.index', compact('evaluations', 'assignedEvaluations', 'receivedEvaluations'));
     }
     
     /**
-     * Show the form for completing an evaluation.
+     * Show the form for creating/editing an evaluation.
      *
      * @param  int  $id
      * @return \Illuminate\View\View
@@ -76,32 +75,28 @@ class EvaluationController extends Controller
             return redirect('/')->with('error', 'You must be a student to access this page.');
         }
         
+        // Get the evaluation and check if it belongs to the student
         $evaluation = Evaluation::where('id', $id)
             ->where('evaluator_id', $student->id)
-            ->where('status', '!=', 'completed')
-            ->with([
-                'submission.brief.criteria',
-                'submission.user:id,username,first_name,last_name',
-                'answers',
-                'submission.content',
-                'submission.file_path',
-            ])
+            ->with(['submission.brief.criteria', 'submission.student:id,username,first_name,last_name'])
             ->firstOrFail();
-        
-        // Load the answers into a collection indexed by criteria_id for easier access
-        $existingAnswers = $evaluation->answers->keyBy('brief_criteria_id');
-        
-        // Check if we need to record that the student has viewed the evaluation
-        if (!$evaluation->viewed_at) {
-            $evaluation->viewed_at = Carbon::now();
-            $evaluation->save();
+            
+        // Don't allow editing completed evaluations
+        if ($evaluation->status === 'completed') {
+            return redirect()->route('evaluations.show', $evaluation->id)
+                ->with('error', 'This evaluation has already been completed and cannot be edited.');
         }
         
+        // Get existing answers (if any)
+        $existingAnswers = $evaluation->answers()
+            ->get()
+            ->keyBy('brief_criteria_id');
+            
         return view('student.evaluations.edit', compact('evaluation', 'existingAnswers'));
     }
     
     /**
-     * Update the specified evaluation with evaluation answers.
+     * Update the evaluation.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
@@ -115,95 +110,90 @@ class EvaluationController extends Controller
             return redirect('/')->with('error', 'You must be a student to access this page.');
         }
         
+        // Get the evaluation and check if it belongs to the student
         $evaluation = Evaluation::where('id', $id)
             ->where('evaluator_id', $student->id)
-            ->where('status', '!=', 'completed')
-            ->with('submission.brief.criteria', 'submission.user')
             ->firstOrFail();
+            
+        // Don't allow editing completed evaluations
+        if ($evaluation->status === 'completed') {
+            return redirect()->route('evaluations.show', $evaluation->id)
+                ->with('error', 'This evaluation has already been completed and cannot be edited.');
+        }
         
-        // Build validation rules based on brief criteria
-        $rules = [];
+        // Validate request data
+        $rules = [
+            'overall_feedback' => ['nullable', 'string', 'max:5000'],
+            'is_complete' => ['nullable', 'boolean'],
+        ];
+        
+        // Add validation rules for each criterion
         foreach ($evaluation->submission->brief->criteria as $criterion) {
             $rules["criteria.{$criterion->id}.valid"] = ['required', 'boolean'];
             $rules["criteria.{$criterion->id}.comment"] = ['nullable', 'string', 'max:1000'];
         }
         
-        $rules['overall_comment'] = ['required', 'string', 'min:10', 'max:1000'];
-        
-        // Add validation for saving as draft
-        if ($request->has('save_draft')) {
-            // Make validation rules optional for drafts
-            foreach ($rules as $key => $rule) {
-                if (strpos($key, '.valid') !== false) {
-                    $rules[$key] = ['nullable', 'boolean'];
-                } else {
-                    $rules[$key] = ['nullable', 'string'];
-                }
-            }
-        }
-        
         $validated = $request->validate($rules);
         
-        // Start a database transaction
+        // Begin database transaction
         \DB::beginTransaction();
         
         try {
-            // Update the evaluation
-            if ($request->has('save_draft')) {
-                $evaluation->overall_comment = $validated['overall_comment'] ?? null;
-                $evaluation->status = 'in_progress';
-                $evaluation->last_edited_at = Carbon::now();
-            } else {
-                $evaluation->overall_comment = $validated['overall_comment'];
+            // Update or create answers for each criterion
+            foreach ($validated['criteria'] as $criterionId => $data) {
+                // Check if an answer for this criterion already exists
+                $answer = EvaluationAnswer::updateOrCreate(
+                    [
+                        'evaluation_id' => $evaluation->id,
+                        'brief_criteria_id' => $criterionId,
+                    ],
+                    [
+                        'is_valid' => $data['valid'],
+                        'comment' => $data['comment'] ?? null,
+                    ]
+                );
+            }
+            
+            // Update the evaluation status if the form is being submitted (not saved as draft)
+            if (isset($validated['is_complete']) && $validated['is_complete']) {
                 $evaluation->status = 'completed';
                 $evaluation->completed_at = Carbon::now();
-            }
-            
-            $evaluation->save();
-            
-            // Save each answer
-            if (isset($validated['criteria'])) {
-                foreach ($validated['criteria'] as $criterionId => $data) {
-                    // Check if an answer for this criterion already exists
-                    $answer = EvaluationAnswer::firstOrNew([
-                        'evaluation_id' => $evaluation->id,
-                        'brief_criteria_id' => $criterionId
-                    ]);
-                    
-                    $answer->is_valid = $data['valid'] ?? null;
-                    $answer->comment = $data['comment'] ?? null;
-                    $answer->save();
+                
+                // Create overall feedback
+                if (!empty($validated['overall_feedback'])) {
+                    Feedback::updateOrCreate(
+                        [
+                            'evaluation_id' => $evaluation->id,
+                        ],
+                        [
+                            'content' => $validated['overall_feedback'],
+                            'created_by' => $student->id,
+                        ]
+                    );
                 }
             }
+            
+            // Always update updated_at
+            $evaluation->touch();
+            $evaluation->save();
             
             \DB::commit();
             
-            // Only send notification if completing the evaluation
-            if (!$request->has('save_draft')) {
-                // Send notification to the student who submitted the work
-                try {
-                    Notification::send($evaluation->submission->user, new EvaluationCompleted($evaluation));
-                } catch (\Exception $e) {
-                    // Log notification error but don't fail the request
-                    \Log::error('Failed to send evaluation notification: ' . $e->getMessage());
-                }
-                
-                return redirect()->route('student.evaluations.index')
-                    ->with('success', 'Evaluation completed successfully.');
+            if (isset($validated['is_complete']) && $validated['is_complete']) {
+                return redirect()->route('evaluations.show', $evaluation->id)
+                    ->with('success', 'Evaluation has been completed successfully!');
+            } else {
+                return redirect()->route('evaluations.edit', $evaluation->id)
+                    ->with('success', 'Your progress has been saved.');
             }
-            
-            return redirect()->route('student.evaluations.edit', $evaluation->id)
-                ->with('success', 'Evaluation draft saved successfully.');
-                
         } catch (\Exception $e) {
             \DB::rollBack();
-            
-            return back()->withInput()->with('error', 'An error occurred while saving your evaluation. Please try again.');
+            return back()->withInput()->with('error', 'An error occurred while saving the evaluation. Please try again.');
         }
     }
     
     /**
-     * Display detailed evaluation results.
+     * Display the specified evaluation.
      *
      * @param  int  $id
      * @return \Illuminate\View\View
@@ -216,66 +206,27 @@ class EvaluationController extends Controller
             return redirect('/')->with('error', 'You must be a student to access this page.');
         }
         
-        // Allow viewing evaluations assigned to the student or evaluations of their submissions
+        // Get the evaluation and check if it's related to the student (either as evaluator or submission owner)
         $evaluation = Evaluation::where(function ($query) use ($student, $id) {
                 $query->where('id', $id)
-                    ->where(function ($q) use ($student) {
-                        $q->where('evaluator_id', $student->id)
-                            ->orWhereHas('submission', function ($sq) use ($student) {
-                                $sq->where('user_id', $student->id);
-                            });
-                    });
+                      ->where('evaluator_id', $student->id);
+            })
+            ->orWhereHas('submission', function ($query) use ($student, $id) {
+                $query->where('evaluation_id', $id)
+                      ->where('student_id', $student->id);
             })
             ->with([
+                'submission.brief',
+                'submission.student:id,username,first_name,last_name',
                 'evaluator:id,username,first_name,last_name',
-                'submission.user:id,username,first_name,last_name',
-                'submission.brief.criteria',
-                'answers',
-                'feedback',
+                'answers.criterion',
+                'feedback'
             ])
             ->firstOrFail();
+            
+        // Fetch the feedback
+        $feedback = $evaluation->feedback()->first();
         
-        return view('student.evaluations.show', compact('evaluation'));
-    }
-    
-    /**
-     * Store feedback for an evaluation.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function feedback(Request $request, $id)
-    {
-        $student = Auth::user();
-        
-        if (!$student->isStudent()) {
-            return redirect('/')->with('error', 'You must be a student to access this page.');
-        }
-        
-        // Ensure the evaluation is for one of the student's submissions
-        $evaluation = Evaluation::whereHas('submission', function ($query) use ($student) {
-                $query->where('user_id', $student->id);
-            })
-            ->where('id', $id)
-            ->where('status', 'completed')
-            ->firstOrFail();
-        
-        $validated = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'comment' => ['required', 'string', 'min:10', 'max:500'],
-        ]);
-        
-        // Check if feedback already exists
-        $feedback = Feedback::firstOrNew([
-            'evaluation_id' => $evaluation->id,
-        ]);
-        
-        $feedback->rating = $validated['rating'];
-        $feedback->comment = $validated['comment'];
-        $feedback->save();
-        
-        return redirect()->route('student.evaluations.show', $evaluation->id)
-            ->with('success', 'Thank you for your feedback on this evaluation.');
+        return view('student.evaluations.show', compact('evaluation', 'feedback'));
     }
 } 

@@ -12,12 +12,17 @@ class EvaluationAssigned extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * The evaluation instance.
+     *
+     * @var \App\Models\Evaluation
+     */
     protected $evaluation;
 
     /**
      * Create a new notification instance.
      *
-     * @param Evaluation $evaluation
+     * @param  \App\Models\Evaluation  $evaluation
      * @return void
      */
     public function __construct(Evaluation $evaluation)
@@ -44,23 +49,16 @@ class EvaluationAssigned extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $submitter = $this->evaluation->submission->user;
         $brief = $this->evaluation->submission->brief;
-        $dueDate = $this->evaluation->due_date;
+        $dueDate = $this->evaluation->due_at ? $this->evaluation->due_at->format('F j, Y') : 'No deadline specified';
         
-        $mailMessage = (new MailMessage)
-            ->subject('New Evaluation Assignment - ' . $brief->title)
+        return (new MailMessage)
+            ->subject('New Evaluation Assignment')
             ->greeting('Hello ' . $notifiable->first_name . ',')
-            ->line('You have been assigned to evaluate a submission for the brief: **' . $brief->title . '**')
-            ->line('This submission was made by: ' . $submitter->username)
-            ->action('Start Evaluation', route('student.evaluations.edit', $this->evaluation->id));
-            
-        if ($dueDate) {
-            $mailMessage->line('**Deadline**: Please complete this evaluation by ' . $dueDate->format('F j, Y'));
-        }
-            
-        return $mailMessage
-            ->line('Thank you for participating in the peer review process!');
+            ->line('You have been assigned to evaluate a submission for "' . $brief->title . '".')
+            ->line('Due date: ' . $dueDate)
+            ->action('Start Evaluation', route('student.evaluations.edit', $this->evaluation->id))
+            ->line('Thank you for your participation in the peer evaluation process!');
     }
 
     /**
@@ -69,19 +67,16 @@ class EvaluationAssigned extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toDatabase($notifiable)
+    public function toArray($notifiable)
     {
-        $submitter = $this->evaluation->submission->user;
         $brief = $this->evaluation->submission->brief;
         
         return [
             'evaluation_id' => $this->evaluation->id,
             'brief_id' => $brief->id,
             'brief_title' => $brief->title,
-            'submitter_username' => $submitter->username,
-            'due_date' => $this->evaluation->due_date ? $this->evaluation->due_date->format('Y-m-d') : null,
-            'message' => 'You have been assigned to evaluate a submission.',
-            'url' => route('student.evaluations.edit', $this->evaluation->id)
+            'message' => 'You have been assigned to evaluate a submission for "' . $brief->title . '".',
+            'due_at' => $this->evaluation->due_at,
         ];
     }
 } 

@@ -12,12 +12,17 @@ class EvaluationCompleted extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    /**
+     * The evaluation instance.
+     *
+     * @var \App\Models\Evaluation
+     */
     protected $evaluation;
 
     /**
      * Create a new notification instance.
      *
-     * @param Evaluation $evaluation
+     * @param  \App\Models\Evaluation  $evaluation
      * @return void
      */
     public function __construct(Evaluation $evaluation)
@@ -44,17 +49,15 @@ class EvaluationCompleted extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $evaluator = $this->evaluation->evaluator;
         $brief = $this->evaluation->submission->brief;
+        $evaluator = $this->evaluation->evaluator;
         
         return (new MailMessage)
-            ->subject('Evaluation Received - ' . $brief->title)
+            ->subject('Your Submission Has Been Evaluated')
             ->greeting('Hello ' . $notifiable->first_name . ',')
-            ->line('Your submission for the brief: **' . $brief->title . '** has been evaluated.')
-            ->line('The evaluation was completed by: ' . $evaluator->username)
-            ->action('View Evaluation Results', route('student.evaluations.show', $this->evaluation->id))
-            ->line('Take some time to review the feedback to improve your future work.')
-            ->line('You can also provide feedback on the quality of this evaluation.');
+            ->line('Your submission for "' . $brief->title . '" has been evaluated by ' . $evaluator->username . '.')
+            ->action('View Evaluation', route('student.evaluations.show', $this->evaluation->id))
+            ->line('Thank you for participating in this project!');
     }
 
     /**
@@ -63,19 +66,18 @@ class EvaluationCompleted extends Notification implements ShouldQueue
      * @param  mixed  $notifiable
      * @return array
      */
-    public function toDatabase($notifiable)
+    public function toArray($notifiable)
     {
-        $evaluator = $this->evaluation->evaluator;
         $brief = $this->evaluation->submission->brief;
+        $evaluator = $this->evaluation->evaluator;
         
         return [
             'evaluation_id' => $this->evaluation->id,
             'brief_id' => $brief->id,
             'brief_title' => $brief->title,
             'evaluator_username' => $evaluator->username,
-            'completed_at' => $this->evaluation->completed_at->format('Y-m-d H:i:s'),
-            'message' => 'Your submission has been evaluated.',
-            'url' => route('student.evaluations.show', $this->evaluation->id)
+            'message' => 'Your submission for "' . $brief->title . '" has been evaluated by ' . $evaluator->username . '.',
+            'completed_at' => $this->evaluation->completed_at,
         ];
     }
 } 

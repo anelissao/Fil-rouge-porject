@@ -115,7 +115,7 @@
                                 <button type="button" class="btn-icon remind-btn" data-id="{{ $evaluation->id }}" title="Send Reminder">
                                     <i class="fas fa-bell"></i>
                                 </button>
-                                <form action="{{ route('teacher.evaluations.destroy', $evaluation->id) }}" 
+                                <form action="{{ route('teacher.evaluations.cancel', $evaluation->id) }}" 
                                       method="POST" class="d-inline delete-form">
                                     @csrf
                                     @method('DELETE')

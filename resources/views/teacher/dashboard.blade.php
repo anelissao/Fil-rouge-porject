@@ -3,486 +3,373 @@
 @section('title', 'Teacher Dashboard')
 
 @section('content')
-    <div class="dashboard-header">
-        <h1 class="dashboard-title">Teacher Dashboard</h1>
-        <p class="dashboard-welcome">Welcome back, {{ auth()->user()->first_name }}!</p>
-    </div>
-
-    <!-- Summary Statistics -->
-    <div class="dashboard-stats">
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $totalBriefs ?? 0 }}</h3>
-                <p class="stat-label">Total Briefs</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-upload"></i>
-            </div>
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $totalSubmissions ?? 0 }}</h3>
-                <p class="stat-label">Total Submissions</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-clipboard-check"></i>
-            </div>
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $pendingEvaluations ?? 0 }}</h3>
-                <p class="stat-label">Pending Evaluations</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content">
-                <h3 class="stat-value">{{ $activeStudents ?? 0 }}</h3>
-                <p class="stat-label">Active Students</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="dashboard-grid">
-        <!-- Active Briefs Section -->
-        <div class="dashboard-card active-briefs">
-            <div class="card-header">
-                <h2 class="section-title">Active Briefs</h2>
-                <a href="{{ route('teacher.briefs.index') }}" class="btn btn-sm btn-outline">View All</a>
+    <div class="container mx-auto px-4 py-6">
+        <h1 class="text-3xl font-bold mb-2">Teacher Dashboard</h1>
+        <p class="text-gray-600 mb-6">Welcome back, {{ Auth::user()->first_name }}!</p>
+        
+        <!-- Summary Statistics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+                        <i class="fas fa-file-alt text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Total Briefs</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $totalBriefs }}</p>
+                    </div>
+                </div>
             </div>
             
-            <div class="briefs-list">
-                @if(isset($activeBriefs) && count($activeBriefs) > 0)
-                    @foreach($activeBriefs as $brief)
-                        <div class="brief-item">
-                            <div class="brief-content">
-                                <h3 class="brief-title">{{ $brief->title }}</h3>
-                                <div class="brief-meta">
-                                    <span class="brief-date">
-                                        <i class="fas fa-calendar-alt"></i> Deadline: {{ $brief->deadline ? $brief->deadline->format('M d, Y') : 'No deadline' }}
-                                    </span>
-                                    <span class="brief-submissions">
-                                        <i class="fas fa-upload"></i> {{ $brief->submissions_count ?? 0 }} Submissions
-                                    </span>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                        <i class="fas fa-paper-plane text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Total Submissions</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $totalSubmissions }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600 mr-4">
+                        <i class="fas fa-clipboard-check text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Pending Evaluations</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $pendingEvaluations }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Active Students</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $activeStudents }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Active Briefs -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-800">Active Briefs</h2>
+                    <a href="{{ route('teacher.briefs.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View All</a>
+                </div>
+                <div class="p-6">
+                    @if(count($activeBriefs) > 0)
+                        <div class="space-y-4">
+                            @foreach($activeBriefs as $brief)
+                                <div class="brief-item border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-150">
+                                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                        <div class="mb-2 md:mb-0">
+                                            <h3 class="font-medium text-gray-900">{{ $brief->title }}</h3>
+                                            <div class="text-sm text-gray-500">
+                                                <span class="mr-4"><i class="far fa-calendar-alt mr-1"></i> Due: {{ $brief->end_date ? $brief->end_date->format('M d, Y') : 'No deadline' }}</span>
+                                                <span><i class="far fa-file-alt mr-1"></i> {{ $brief->submissions_count }} submissions</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex space-x-2">
+                                            <a href="{{ route('teacher.briefs.show', $brief->id) }}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                View
+                                            </a>
+                                            <a href="{{ route('teacher.briefs.submissions', $brief->id) }}" class="inline-flex items-center px-3 py-1 border border-gray-300 text-sm rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                Submissions
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="brief-status">
-                                <span class="status-indicator {{ $brief->deadline && Carbon\Carbon::now()->gt($brief->deadline) ? 'expired' : 'active' }}">
-                                    {{ $brief->deadline && Carbon\Carbon::now()->gt($brief->deadline) ? 'Expired' : 'Active' }}
-                                </span>
-                            </div>
+                            @endforeach
                         </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <i class="fas fa-file-alt"></i>
-                        <p>No active briefs found.</p>
-                        <a href="{{ route('teacher.briefs.create') }}" class="btn btn-primary">Create Brief</a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Recent Submissions Section -->
-        <div class="dashboard-card recent-submissions">
-            <div class="card-header">
-                <h2 class="section-title">Recent Submissions</h2>
-                <a href="{{ route('teacher.submissions.index') }}" class="btn btn-sm btn-outline">View All</a>
+                    @else
+                        <div class="text-center py-8">
+                            <div class="text-gray-400 mb-2">
+                                <i class="fas fa-file-alt text-4xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">No active briefs</h3>
+                            <p class="text-gray-500 mb-3">You don't have any active briefs at the moment.</p>
+                            <a href="{{ route('teacher.briefs.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <i class="fas fa-plus mr-2"></i> Create Brief
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
             
-            <div class="submissions-list">
-                @if(isset($recentSubmissions) && count($recentSubmissions) > 0)
-                    @foreach($recentSubmissions as $submission)
-                        <div class="submission-item">
-                            <div class="submission-icon">
-                                <i class="fas fa-file-upload"></i>
+            <!-- Quick Actions -->
+            <div class="lg:col-span-1 bg-white rounded-lg shadow">
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <h2 class="text-xl font-bold text-gray-800">Quick Actions</h2>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 gap-4">
+                        <a href="{{ route('teacher.briefs.create') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-indigo-50 hover:border-indigo-200 transition-colors duration-150">
+                            <div class="flex-shrink-0 p-3 rounded-full bg-indigo-100 text-indigo-600 group-hover:bg-indigo-200">
+                                <i class="fas fa-plus text-lg"></i>
                             </div>
-                            <div class="submission-content">
-                                <h3 class="submission-title">{{ $submission->student->username }} submitted for {{ $submission->brief->title }}</h3>
-                                <div class="submission-meta">
-                                    <span class="submission-date">
-                                        <i class="fas fa-clock"></i> {{ $submission->created_at->diffForHumans() }}
-                                    </span>
-                                </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900 group-hover:text-indigo-900">Create Brief</h3>
+                                <p class="text-sm text-gray-500 group-hover:text-indigo-700">Create a new assignment for students</p>
                             </div>
-                            <div class="submission-action">
-                                <a href="{{ route('teacher.submissions.show', $submission->id) }}" class="btn btn-sm btn-outline">View</a>
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <i class="fas fa-upload"></i>
-                        <p>No recent submissions found.</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Pending Evaluations Section -->
-        <div class="dashboard-card pending-evaluations">
-            <div class="card-header">
-                <h2 class="section-title">Pending Evaluations</h2>
-                <a href="{{ route('teacher.evaluations.index') }}" class="btn btn-sm btn-outline">Manage</a>
-            </div>
-            
-            <div class="evaluations-list">
-                @if(isset($evaluations) && count($evaluations) > 0)
-                    @foreach($evaluations as $evaluation)
-                        <div class="evaluation-item">
-                            <div class="evaluation-content">
-                                <h3 class="evaluation-title">{{ $evaluation->evaluator->username }} → {{ $evaluation->submission->student->username }}</h3>
-                                <div class="evaluation-meta">
-                                    <span class="evaluation-brief">{{ $evaluation->submission->brief->title ?? 'Brief' }}</span>
-                                    <span class="evaluation-due">{{ $evaluation->created_at->diffForHumans() }}</span>
-                                </div>
-                            </div>
-                            <div class="evaluation-status">
-                                @if($evaluation->is_overdue)
-                                    <span class="status-indicator overdue">Overdue</span>
-                                @else
-                                    <span class="status-indicator pending">Pending</span>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-check"></i>
-                        <p>No pending evaluations found.</p>
-                        <a href="{{ route('teacher.evaluations.assign') }}" class="btn btn-primary">Assign Evaluations</a>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="dashboard-card quick-actions">
-            <div class="card-header">
-                <h2 class="section-title">Quick Actions</h2>
-            </div>
-            
-            <div class="actions-grid">
-                <a href="{{ route('teacher.briefs.create') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <h3 class="action-title">Create Brief</h3>
-                </a>
-                
-                <div class="action-card-dropdown">
-                    <div class="action-icon">
-                        <i class="fas fa-user-check"></i>
-                    </div>
-                    <h3 class="action-title">Assign Evaluations</h3>
-                    <div class="dropdown-content">
-                        <a href="{{ route('teacher.evaluations.assign') }}" class="dropdown-item">
-                            <i class="fas fa-user-check"></i> Manual Assignment
                         </a>
-                        <a href="{{ route('teacher.evaluations.random') }}" class="dropdown-item">
-                            <i class="fas fa-random"></i> Random Assignment
+                        
+                        <a href="{{ route('teacher.evaluations.assign') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-50 hover:border-blue-200 transition-colors duration-150">
+                            <div class="flex-shrink-0 p-3 rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-200">
+                                <i class="fas fa-user-check text-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900 group-hover:text-blue-900">Assign Evaluations</h3>
+                                <p class="text-sm text-gray-500 group-hover:text-blue-700">Assign peer evaluations to students</p>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('teacher.evaluations.random') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-purple-50 hover:border-purple-200 transition-colors duration-150">
+                            <div class="flex-shrink-0 p-3 rounded-full bg-purple-100 text-purple-600 group-hover:bg-purple-200">
+                                <i class="fas fa-random text-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900 group-hover:text-purple-900">Random Evaluations</h3>
+                                <p class="text-sm text-gray-500 group-hover:text-purple-700">Randomly assign peer evaluations</p>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ route('teacher.results.index') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-green-50 hover:border-green-200 transition-colors duration-150">
+                            <div class="flex-shrink-0 p-3 rounded-full bg-green-100 text-green-600 group-hover:bg-green-200">
+                                <i class="fas fa-chart-bar text-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900 group-hover:text-green-900">View Results</h3>
+                                <p class="text-sm text-gray-500 group-hover:text-green-700">See evaluation results and reports</p>
+                            </div>
+                        </a>
+                        
+                        <a href="{{ route('teacher.submissions.index') }}" class="group flex items-center p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-yellow-50 hover:border-yellow-200 transition-colors duration-150">
+                            <div class="flex-shrink-0 p-3 rounded-full bg-yellow-100 text-yellow-600 group-hover:bg-yellow-200">
+                                <i class="fas fa-inbox text-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900 group-hover:text-yellow-900">All Submissions</h3>
+                                <p class="text-sm text-gray-500 group-hover:text-yellow-700">View all student submissions</p>
+                            </div>
                         </a>
                     </div>
                 </div>
-                
-                <a href="{{ route('teacher.results.index') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <h3 class="action-title">View Results</h3>
-                </a>
-                <a href="{{ route('teacher.submissions.index') }}" class="action-card">
-                    <div class="action-icon">
-                        <i class="fas fa-list-alt"></i>
-                    </div>
-                    <h3 class="action-title">All Submissions</h3>
-                </a>
+            </div>
+            
+            <!-- Recent Submissions -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-800">Recent Submissions</h2>
+                    <a href="{{ route('teacher.submissions.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View All</a>
+                </div>
+                <div class="p-6">
+                    @if(count($recentSubmissions) > 0)
+                        <div class="space-y-4">
+                            @foreach($recentSubmissions as $submission)
+                                <div class="submission-item border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-150">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="font-medium text-gray-900">{{ $submission->user->username }}</h3>
+                                            <p class="text-sm text-gray-500">
+                                                Brief: {{ Str::limit($submission->brief->title, 30) }}
+                                            </p>
+                                            <p class="text-xs text-gray-400 mt-1">
+                                                Submitted: {{ $submission->created_at->diffForHumans() }}
+                                            </p>
+                                        </div>
+                                        <a href="{{ route('teacher.submissions.show', $submission->id) }}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <div class="text-gray-400 mb-2">
+                                <i class="fas fa-inbox text-4xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">No recent submissions</h3>
+                            <p class="text-gray-500">Students haven't submitted any work recently.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            
+            <!-- Pending Evaluations -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-bold text-gray-800">Pending Evaluations</h2>
+                    <a href="{{ route('teacher.evaluations.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View All</a>
+                </div>
+                <div class="p-6">
+                    @if(count($evaluations) > 0)
+                        <div class="space-y-4">
+                            @foreach($evaluations as $evaluation)
+                                <div class="evaluation-item border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-150 {{ $evaluation->is_overdue ? 'border-red-300 bg-red-50' : '' }}">
+                                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                        <div class="mb-2 md:mb-0">
+                                            <h3 class="font-medium text-gray-900">
+                                                Evaluator: {{ $evaluation->evaluator->username }}
+                                                <span class="mx-2">•</span>
+                                                Student: {{ $evaluation->submission->user->username }}
+                                            </h3>
+                                            <p class="text-sm text-gray-500">
+                                                Brief: {{ Str::limit($evaluation->submission->brief->title, 40) }}
+                                            </p>
+                                            <p class="text-xs {{ $evaluation->is_overdue ? 'text-red-600 font-semibold' : 'text-gray-400' }} mt-1">
+                                                @if($evaluation->due_date)
+                                                    Due: {{ $evaluation->due_date->format('M d, Y') }}
+                                                    @if($evaluation->is_overdue)
+                                                        <span class="ml-2 text-red-600 font-semibold">(Overdue)</span>
+                                                    @endif
+                                                @else
+                                                    Assigned: {{ $evaluation->created_at->format('M d, Y') }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="flex space-x-2 items-center">
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full
+                                                @if($evaluation->status == 'completed') bg-green-100 text-green-800
+                                                @elseif($evaluation->status == 'in_progress') bg-yellow-100 text-yellow-800
+                                                @else bg-gray-100 text-gray-800 @endif">
+                                                {{ ucfirst($evaluation->status) }}
+                                            </span>
+                                            <a href="{{ route('teacher.evaluations.show', $evaluation->id) }}" class="inline-flex items-center px-3 py-1 border border-transparent text-sm rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                View
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8">
+                            <div class="text-gray-400 mb-2">
+                                <i class="fas fa-clipboard-check text-4xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">No pending evaluations</h3>
+                            <p class="text-gray-500 mb-3">There are no pending evaluations at the moment.</p>
+                            <a href="{{ route('teacher.evaluations.assign') }}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <i class="fas fa-plus mr-2"></i> Assign Evaluations
+                            </a>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
-@endsection
 
-@section('styles')
-<style>
-    /* Dashboard Grid Layout */
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-        margin-top: 2rem;
-    }
-
-    .dashboard-card {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-
-    .btn-sm {
-        padding: 0.25rem 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    /* Active Briefs Styles */
-    .brief-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .brief-item:last-child {
-        border-bottom: none;
-    }
-
-    .brief-title {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-        color: var(--secondary-color);
-    }
-
-    .brief-meta {
-        display: flex;
-        gap: 1rem;
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    .status-indicator {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .status-indicator.active {
-        background-color: rgba(16, 185, 129, 0.1);
-        color: #10B981;
-    }
-
-    .status-indicator.expired {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: #EF4444;
-    }
-
-    /* Recent Submissions Styles */
-    .submission-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .submission-item:last-child {
-        border-bottom: none;
-    }
-
-    .submission-icon {
-        width: 2.5rem;
-        height: 2.5rem;
-        background-color: var(--primary-color);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 1rem;
-        font-size: 1rem;
-        color: var(--secondary-color);
-    }
-
-    .submission-content {
-        flex: 1;
-    }
-
-    .submission-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.25rem;
-        color: var(--secondary-color);
-    }
-
-    .submission-meta {
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    /* Pending Evaluations Styles */
-    .evaluation-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 0;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .evaluation-item:last-child {
-        border-bottom: none;
-    }
-
-    .evaluation-title {
-        font-size: 0.95rem;
-        margin-bottom: 0.25rem;
-        color: var(--secondary-color);
-    }
-
-    .evaluation-meta {
-        display: flex;
-        flex-direction: column;
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    .evaluation-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 1rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        background-color: rgba(16, 185, 129, 0.1);
-        color: #10B981;
-    }
-
-    .evaluation-status.overdue {
-        background-color: rgba(239, 68, 68, 0.1);
-        color: #EF4444;
-    }
-
-    /* Empty State Styles */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-        color: var(--accent-color);
-        text-align: center;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state p {
-        margin-bottom: 1rem;
-    }
-
-    /* Quick Actions Styles */
-    .actions-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-    }
-
-    .action-card, .action-card-dropdown {
-        background-color: rgba(30, 144, 255, 0.1);
-        border-radius: 0.5rem;
-        padding: 1.25rem 1rem;
-        text-align: center;
-        text-decoration: none;
-        transition: transform 0.3s, background-color 0.3s;
-        position: relative;
-    }
-
-    .action-card:hover {
-        transform: translateY(-5px);
-        background-color: var(--primary-color);
-    }
-
-    .action-card-dropdown {
-        cursor: pointer;
-    }
-
-    .action-card-dropdown:hover {
-        background-color: var(--primary-color);
-    }
-
-    .action-card-dropdown:hover .dropdown-content {
-        display: block;
-    }
-
-    .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: var(--highlight-color);
-        min-width: 200px;
-        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-        z-index: 1;
-        border-radius: 0.5rem;
-        top: 100%;
-        left: 0;
-        margin-top: 0.5rem;
-    }
-
-    .dropdown-item {
-        color: var(--secondary-color);
-        padding: 0.75rem 1rem;
-        text-decoration: none;
-        display: block;
-        text-align: left;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .dropdown-item:last-child {
-        border-bottom: none;
-    }
-
-    .dropdown-item:hover {
-        background-color: rgba(30, 144, 255, 0.1);
-    }
-
-    .dropdown-item i {
-        margin-right: 0.5rem;
-    }
-
-    .action-icon {
-        font-size: 1.75rem;
-        color: var(--primary-color);
-        margin-bottom: 0.75rem;
-    }
-
-    .action-card:hover .action-icon, 
-    .action-card-dropdown:hover .action-icon {
-        color: var(--secondary-color);
-    }
-
-    .action-title {
-        font-size: 0.95rem;
-        color: var(--secondary-color);
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 992px) {
+    <style>
+        /* Dashboard grid layout */
         .dashboard-grid {
+            display: grid;
             grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .brief-meta, .submission-meta {
-            flex-direction: column;
+            gap: 1.5rem;
         }
         
-        .brief-meta span, .submission-meta span {
-            margin-bottom: 0.25rem;
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 2fr 1fr;
+            }
         }
         
-        .actions-grid {
-            grid-template-columns: 1fr;
+        /* Card design */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            overflow: hidden;
         }
-    }
-</style>
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Action cards */
+        .action-cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .action-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .action-card:hover {
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .action-icon {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            margin-right: 1rem;
+        }
+        
+        /* Brief items */
+        .brief-item {
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .brief-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Submission items */
+        .submission-item {
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .submission-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Evaluation items */
+        .evaluation-item {
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        
+        .evaluation-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 640px) {
+            .action-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 @endsection 

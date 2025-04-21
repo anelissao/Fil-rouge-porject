@@ -50,7 +50,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/briefs/{id}', [BriefController::class, 'show'])->name('briefs.show');
     
     // Evaluation routes (accessible by both teachers and students)
-    Route::get('/evaluations/{evaluation}', [EvaluationController::class, 'show'])->name('evaluations.show');
+    Route::get('/evaluations', [App\Http\Controllers\Teacher\EvaluationController::class, 'index'])->name('evaluations.index');
+    Route::get('/evaluations/assign', [App\Http\Controllers\Teacher\AssignmentController::class, 'manualForm'])->name('evaluations.assign');
+    Route::post('/evaluations/assign', [App\Http\Controllers\Teacher\AssignmentController::class, 'storeManual'])->name('evaluations.store');
+    Route::get('/evaluations/random', [App\Http\Controllers\Teacher\AssignmentController::class, 'randomForm'])->name('evaluations.random');
+    Route::post('/evaluations/random', [App\Http\Controllers\Teacher\AssignmentController::class, 'storeRandom'])->name('evaluations.random.store');
+    Route::get('/evaluations/{id}/student/{student_id}', [App\Http\Controllers\Teacher\EvaluationController::class, 'showStudentEvaluation'])->name('evaluations.student.show');
+    Route::get('/evaluations/{evaluation}', [App\Http\Controllers\Teacher\EvaluationController::class, 'show'])->name('evaluations.show');
+    Route::post('/evaluations/{id}/reassign', [App\Http\Controllers\Teacher\AssignmentController::class, 'reassign'])->name('evaluations.reassign');
+    Route::delete('/evaluations/{id}', [App\Http\Controllers\Teacher\AssignmentController::class, 'cancel'])->name('evaluations.cancel');
+    Route::post('/evaluations/{evaluation}/remind', [App\Http\Controllers\Teacher\EvaluationController::class, 'sendReminder'])->name('evaluations.remind');
 
     // Student-specific routes
     Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
@@ -65,13 +74,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/submissions/{submission}/download', [App\Http\Controllers\Student\SubmissionController::class, 'download'])->name('submissions.download');
 
         // Evaluations
-        Route::get('/evaluations', function() {
-            // Check if user is student
-            if (Auth::user()->role !== 'student') {
-                return redirect('/')->with('error', 'Only students can access this area.');
-            }
-            return view('student.evaluations.index');
-        })->name('evaluations.index');
+        Route::get('/evaluations', [App\Http\Controllers\Student\EvaluationController::class, 'index'])->name('evaluations.index');
+        Route::get('/evaluations/{id}/edit', [App\Http\Controllers\Student\EvaluationController::class, 'edit'])->name('evaluations.edit');
+        Route::put('/evaluations/{id}', [App\Http\Controllers\Student\EvaluationController::class, 'update'])->name('evaluations.update');
+        Route::get('/evaluations/{id}', [App\Http\Controllers\Student\EvaluationController::class, 'show'])->name('evaluations.show');
     });
 
     // Teacher-specific routes
@@ -94,20 +100,22 @@ Route::middleware(['auth'])->group(function () {
         
         // Evaluations
         Route::get('/evaluations', [App\Http\Controllers\Teacher\EvaluationController::class, 'index'])->name('evaluations.index');
-        Route::get('/evaluations/assign', [App\Http\Controllers\Teacher\EvaluationController::class, 'assignForm'])->name('evaluations.assign');
-        Route::post('/evaluations', [App\Http\Controllers\Teacher\EvaluationController::class, 'store'])->name('evaluations.store');
-        
-        // Random evaluation assignments
-        Route::get('/evaluations/random', [App\Http\Controllers\Teacher\EvaluationController::class, 'randomForm'])->name('evaluations.random');
-        Route::post('/evaluations/random', [App\Http\Controllers\Teacher\EvaluationController::class, 'assignRandom'])->name('evaluations.random.store');
+        // Specific routes must come before wildcard routes
+        Route::get('/evaluations/assign', [App\Http\Controllers\Teacher\AssignmentController::class, 'manualForm'])->name('evaluations.assign');
+        Route::post('/evaluations/assign', [App\Http\Controllers\Teacher\AssignmentController::class, 'storeManual'])->name('evaluations.store');
+        Route::get('/evaluations/random', [App\Http\Controllers\Teacher\AssignmentController::class, 'randomForm'])->name('evaluations.random');
+        Route::post('/evaluations/random', [App\Http\Controllers\Teacher\AssignmentController::class, 'storeRandom'])->name('evaluations.random.store');
+        // Wildcard routes come after specific routes
+        Route::get('/evaluations/{evaluation}', [App\Http\Controllers\Teacher\EvaluationController::class, 'show'])->name('evaluations.show');
+        Route::get('/evaluations/{id}/student/{student_id}', [App\Http\Controllers\Teacher\EvaluationController::class, 'showStudentEvaluation'])->name('evaluations.student.show');
+        Route::post('/evaluations/{id}/reassign', [App\Http\Controllers\Teacher\AssignmentController::class, 'reassign'])->name('evaluations.reassign');
+        Route::delete('/evaluations/{id}', [App\Http\Controllers\Teacher\AssignmentController::class, 'cancel'])->name('evaluations.cancel');
+        Route::post('/evaluations/{evaluation}/remind', [App\Http\Controllers\Teacher\EvaluationController::class, 'sendReminder'])->name('evaluations.remind');
         
         // Results
         Route::get('/results', [App\Http\Controllers\Teacher\ResultsController::class, 'index'])->name('results.index');
         Route::get('/results/{id}', [App\Http\Controllers\Teacher\ResultsController::class, 'show'])->name('results.show');
         Route::get('/results/{id}/export', [App\Http\Controllers\Teacher\ResultsController::class, 'export'])->name('results.export');
-        
-        // Additional evaluation routes
-        Route::post('/evaluations/{evaluation}/remind', [App\Http\Controllers\Teacher\EvaluationController::class, 'sendReminder'])->name('evaluations.remind');
     });
 
     // Admin-specific routes
