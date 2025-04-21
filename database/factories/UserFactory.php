@@ -24,12 +24,36 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'username' => fake()->unique()->userName(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make('password123'),
+            'role' => fake()->randomElement(['student', 'teacher']),
+            'bio' => fake()->paragraph(),
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Configure the model factory for students.
+     */
+    public function student(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'student',
+        ]);
+    }
+
+    /**
+     * Configure the model factory for teachers.
+     */
+    public function teacher(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'teacher',
+        ]);
     }
 
     /**

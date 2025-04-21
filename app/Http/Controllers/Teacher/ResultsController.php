@@ -8,7 +8,7 @@ use App\Models\Brief;
 use App\Models\Submission;
 use App\Models\Evaluation;
 use App\Models\User;
-use App\Models\Criterion;
+use App\Models\BriefCriteria;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -101,7 +101,7 @@ class ResultsController extends Controller
         $brief = Brief::where('teacher_id', $teacher->id)->findOrFail($id);
         
         // Get all submissions for this brief with their evaluations
-        $submissions = Submission::with(['user', 'evaluations.evaluator', 'evaluations.criteriaScores.criterion'])
+        $submissions = Submission::with(['student', 'evaluations.evaluator', 'evaluations.criteriaScores.criterion'])
             ->where('brief_id', $brief->id)
             ->get();
             
@@ -110,6 +110,11 @@ class ResultsController extends Controller
         $evaluatedSubmissions = $submissions->filter(function($submission) {
             return $submission->evaluations->isNotEmpty();
         })->count();
+        
+        // Calculate completion rate
+        $completionRate = $totalSubmissions > 0 
+            ? round(($evaluatedSubmissions / $totalSubmissions) * 100) 
+            : 0;
         
         $averageScore = 0;
         $scoreDistribution = [
@@ -121,16 +126,16 @@ class ResultsController extends Controller
         ];
         
         // Criteria performance
-        $criteria = Criterion::whereHas('brief', function($query) use ($brief) {
+        $criteria = BriefCriteria::whereHas('brief', function($query) use ($brief) {
             $query->where('id', $brief->id);
         })->get();
         
         $criteriaPerformance = [];
         foreach ($criteria as $criterion) {
             $criteriaPerformance[$criterion->id] = [
-                'name' => $criterion->name,
+                'name' => $criterion->title,
                 'description' => $criterion->description,
-                'weight' => $criterion->weight,
+                'weight' => $criterion->weight ?? 1,
                 'averageScore' => 0,
                 'totalScores' => 0,
                 'count' => 0
@@ -155,7 +160,7 @@ class ResultsController extends Controller
             foreach ($submissionEvaluations as $evaluation) {
                 foreach ($evaluation->criteriaScores as $criteriaScore) {
                     $criterionId = $criteriaScore->criterion_id;
-                    $weight = $criteriaScore->criterion->weight;
+                    $weight = $criteriaScore->criterion->weight ?? 1;
                     $score = $criteriaScore->score;
                     
                     // Update criteria performance
@@ -190,8 +195,8 @@ class ResultsController extends Controller
             }
             
             // Update student performance
-            $studentPerformance[$submission->user->id] = [
-                'name' => $submission->user->name,
+            $studentPerformance[$submission->student->id] = [
+                'name' => $submission->student->name ?? $submission->student->username,
                 'score' => round($percentageScore, 1),
                 'submission_id' => $submission->id
             ];
@@ -217,7 +222,8 @@ class ResultsController extends Controller
             'averageScore',
             'scoreDistribution',
             'criteriaPerformance',
-            'studentPerformance'
+            'studentPerformance',
+            'completionRate'
         ));
     }
     

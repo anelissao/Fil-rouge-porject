@@ -102,7 +102,7 @@
                                        {{ in_array($class->id, old('classes', $assignedClasses ?? [])) ? 'checked' : '' }}>
                                 <div class="ml-3">
                                     <p class="text-sm font-medium text-gray-900">{{ $class->name }}</p>
-                                    <p class="text-xs text-gray-500">{{ $class->students->count() }} students</p>
+                                    <p class="text-xs text-gray-500">{{ $class->students && is_object($class->students) ? $class->students->count() : 0 }} students</p>
                                 </div>
                             </label>
                         @endforeach

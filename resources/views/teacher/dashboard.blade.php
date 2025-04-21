@@ -174,12 +174,22 @@
                     </div>
                     <h3 class="action-title">Create Brief</h3>
                 </a>
-                <a href="{{ route('teacher.evaluations.assign') }}" class="action-card">
+                
+                <div class="action-card-dropdown">
                     <div class="action-icon">
                         <i class="fas fa-user-check"></i>
                     </div>
                     <h3 class="action-title">Assign Evaluations</h3>
-                </a>
+                    <div class="dropdown-content">
+                        <a href="{{ route('teacher.evaluations.assign') }}" class="dropdown-item">
+                            <i class="fas fa-user-check"></i> Manual Assignment
+                        </a>
+                        <a href="{{ route('teacher.evaluations.random') }}" class="dropdown-item">
+                            <i class="fas fa-random"></i> Random Assignment
+                        </a>
+                    </div>
+                </div>
+                
                 <a href="{{ route('teacher.results.index') }}" class="action-card">
                     <div class="action-icon">
                         <i class="fas fa-chart-bar"></i>
@@ -377,18 +387,65 @@
         gap: 1rem;
     }
 
-    .action-card {
+    .action-card, .action-card-dropdown {
         background-color: rgba(30, 144, 255, 0.1);
         border-radius: 0.5rem;
         padding: 1.25rem 1rem;
         text-align: center;
         text-decoration: none;
         transition: transform 0.3s, background-color 0.3s;
+        position: relative;
     }
 
     .action-card:hover {
         transform: translateY(-5px);
         background-color: var(--primary-color);
+    }
+
+    .action-card-dropdown {
+        cursor: pointer;
+    }
+
+    .action-card-dropdown:hover {
+        background-color: var(--primary-color);
+    }
+
+    .action-card-dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: var(--highlight-color);
+        min-width: 200px;
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        z-index: 1;
+        border-radius: 0.5rem;
+        top: 100%;
+        left: 0;
+        margin-top: 0.5rem;
+    }
+
+    .dropdown-item {
+        color: var(--secondary-color);
+        padding: 0.75rem 1rem;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(30, 144, 255, 0.1);
+    }
+
+    .dropdown-item i {
+        margin-right: 0.5rem;
     }
 
     .action-icon {
@@ -397,7 +454,8 @@
         margin-bottom: 0.75rem;
     }
 
-    .action-card:hover .action-icon {
+    .action-card:hover .action-icon, 
+    .action-card-dropdown:hover .action-icon {
         color: var(--secondary-color);
     }
 
