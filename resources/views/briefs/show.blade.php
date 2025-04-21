@@ -37,11 +37,11 @@
                     
                     @if(auth()->user()->isStudent() && $brief->status == 'published' && !$brief->isExpired())
                         @if($hasSubmitted)
-                            <a href="{{ route('submissions.index', ['brief_id' => $brief->id]) }}" class="btn btn-outline-success">
+                            <a href="{{ route('student.submissions.index', ['brief_id' => $brief->id]) }}" class="btn btn-outline-success">
                                 <i class="fas fa-check-circle me-1"></i> Submitted
                             </a>
                         @else
-                            <a href="{{ route('submissions.create', ['brief_id' => $brief->id]) }}" class="btn btn-primary">
+                            <a href="{{ route('student.submissions.create', ['brief_id' => $brief->id]) }}" class="btn btn-primary">
                                 <i class="fas fa-upload me-1"></i> Submit
                             </a>
                         @endif

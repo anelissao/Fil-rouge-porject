@@ -99,7 +99,7 @@
                                         @endif
                                         
                                         @if(auth()->user()->isStudent() && $brief->status == 'published' && !$brief->isExpired())
-                                            <a href="{{ route('submissions.create', ['brief_id' => $brief->id]) }}" class="btn btn-sm btn-primary ms-1">
+                                            <a href="{{ route('student.submissions.create', ['brief_id' => $brief->id]) }}" class="btn btn-sm btn-primary ms-1">
                                                 <i class="fas fa-upload me-1"></i> Submit
                                             </a>
                                         @endif
