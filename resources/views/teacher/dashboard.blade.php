@@ -64,7 +64,7 @@
                                 <h3 class="brief-title">{{ $brief->title }}</h3>
                                 <div class="brief-meta">
                                     <span class="brief-date">
-                                        <i class="fas fa-calendar-alt"></i> Deadline: {{ $brief->end_date->format('M d, Y') }}
+                                        <i class="fas fa-calendar-alt"></i> Deadline: {{ $brief->deadline ? $brief->deadline->format('M d, Y') : 'No deadline' }}
                                     </span>
                                     <span class="brief-submissions">
                                         <i class="fas fa-upload"></i> {{ $brief->submissions_count ?? 0 }} Submissions
@@ -72,8 +72,8 @@
                                 </div>
                             </div>
                             <div class="brief-status">
-                                <span class="status-indicator {{ Carbon\Carbon::now()->gt($brief->end_date) ? 'expired' : 'active' }}">
-                                    {{ Carbon\Carbon::now()->gt($brief->end_date) ? 'Expired' : 'Active' }}
+                                <span class="status-indicator {{ $brief->deadline && Carbon\Carbon::now()->gt($brief->deadline) ? 'expired' : 'active' }}">
+                                    {{ $brief->deadline && Carbon\Carbon::now()->gt($brief->deadline) ? 'Expired' : 'Active' }}
                                 </span>
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                 <i class="fas fa-file-upload"></i>
                             </div>
                             <div class="submission-content">
-                                <h3 class="submission-title">{{ $submission->user->username }} submitted for {{ $submission->brief->title }}</h3>
+                                <h3 class="submission-title">{{ $submission->student->username }} submitted for {{ $submission->brief->title }}</h3>
                                 <div class="submission-meta">
                                     <span class="submission-date">
                                         <i class="fas fa-clock"></i> {{ $submission->created_at->diffForHumans() }}
@@ -136,7 +136,7 @@
                     @foreach($evaluations as $evaluation)
                         <div class="evaluation-item">
                             <div class="evaluation-content">
-                                <h3 class="evaluation-title">{{ $evaluation->evaluator->username }} → {{ $evaluation->submission->user->username }}</h3>
+                                <h3 class="evaluation-title">{{ $evaluation->evaluator->username }} → {{ $evaluation->submission->student->username }}</h3>
                                 <div class="evaluation-meta">
                                     <span class="evaluation-brief">{{ $evaluation->submission->brief->title ?? 'Brief' }}</span>
                                     <span class="evaluation-due">{{ $evaluation->created_at->diffForHumans() }}</span>

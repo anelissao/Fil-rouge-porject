@@ -11,6 +11,9 @@ use App\Models\Evaluation;
 use App\Models\EvaluationAnswer;
 use App\Models\Feedback;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\EvaluationCompleted;
+use App\Notifications\EvaluationAssigned;
 
 class EvaluationController extends Controller
 {
@@ -30,16 +33,22 @@ class EvaluationController extends Controller
         // Evaluations the student needs to perform
         $assignedEvaluations = Evaluation::where('evaluator_id', $student->id)
             ->with([
-                'submission.brief:id,title',
-                'submission.student:id,username,first_name,last_name',
+                'submission.brief:id,title,end_date',
+                'submission.user:id,username,first_name,last_name',
             ])
             ->orderBy('status')
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'assigned_page');
         
+        // Map to add overdue flag
+        $assignedEvaluations->getCollection()->transform(function ($evaluation) {
+            $evaluation->is_overdue = $evaluation->due_date && $evaluation->due_date->isPast();
+            return $evaluation;
+        });
+        
         // Evaluations received on the student's submissions
         $receivedEvaluations = Evaluation::whereHas('submission', function ($query) use ($student) {
-                $query->where('student_id', $student->id);
+                $query->where('user_id', $student->id);
             })
             ->with([
                 'evaluator:id,username,first_name,last_name',
@@ -72,13 +81,21 @@ class EvaluationController extends Controller
             ->where('status', '!=', 'completed')
             ->with([
                 'submission.brief.criteria',
-                'submission.student:id,username,first_name,last_name',
+                'submission.user:id,username,first_name,last_name',
                 'answers',
+                'submission.content',
+                'submission.file_path',
             ])
             ->firstOrFail();
         
         // Load the answers into a collection indexed by criteria_id for easier access
         $existingAnswers = $evaluation->answers->keyBy('brief_criteria_id');
+        
+        // Check if we need to record that the student has viewed the evaluation
+        if (!$evaluation->viewed_at) {
+            $evaluation->viewed_at = Carbon::now();
+            $evaluation->save();
+        }
         
         return view('student.evaluations.edit', compact('evaluation', 'existingAnswers'));
     }
@@ -101,7 +118,7 @@ class EvaluationController extends Controller
         $evaluation = Evaluation::where('id', $id)
             ->where('evaluator_id', $student->id)
             ->where('status', '!=', 'completed')
-            ->with('submission.brief.criteria')
+            ->with('submission.brief.criteria', 'submission.user')
             ->firstOrFail();
         
         // Build validation rules based on brief criteria
@@ -113,6 +130,18 @@ class EvaluationController extends Controller
         
         $rules['overall_comment'] = ['required', 'string', 'min:10', 'max:1000'];
         
+        // Add validation for saving as draft
+        if ($request->has('save_draft')) {
+            // Make validation rules optional for drafts
+            foreach ($rules as $key => $rule) {
+                if (strpos($key, '.valid') !== false) {
+                    $rules[$key] = ['nullable', 'boolean'];
+                } else {
+                    $rules[$key] = ['nullable', 'string'];
+                }
+            }
+        }
+        
         $validated = $request->validate($rules);
         
         // Start a database transaction
@@ -120,28 +149,52 @@ class EvaluationController extends Controller
         
         try {
             // Update the evaluation
-            $evaluation->overall_comment = $validated['overall_comment'];
-            $evaluation->status = 'completed';
-            $evaluation->completed_at = Carbon::now();
+            if ($request->has('save_draft')) {
+                $evaluation->overall_comment = $validated['overall_comment'] ?? null;
+                $evaluation->status = 'in_progress';
+                $evaluation->last_edited_at = Carbon::now();
+            } else {
+                $evaluation->overall_comment = $validated['overall_comment'];
+                $evaluation->status = 'completed';
+                $evaluation->completed_at = Carbon::now();
+            }
+            
             $evaluation->save();
             
             // Save each answer
-            foreach ($validated['criteria'] as $criterionId => $data) {
-                // Check if an answer for this criterion already exists
-                $answer = EvaluationAnswer::firstOrNew([
-                    'evaluation_id' => $evaluation->id,
-                    'brief_criteria_id' => $criterionId
-                ]);
-                
-                $answer->is_valid = $data['valid'];
-                $answer->comment = $data['comment'] ?? null;
-                $answer->save();
+            if (isset($validated['criteria'])) {
+                foreach ($validated['criteria'] as $criterionId => $data) {
+                    // Check if an answer for this criterion already exists
+                    $answer = EvaluationAnswer::firstOrNew([
+                        'evaluation_id' => $evaluation->id,
+                        'brief_criteria_id' => $criterionId
+                    ]);
+                    
+                    $answer->is_valid = $data['valid'] ?? null;
+                    $answer->comment = $data['comment'] ?? null;
+                    $answer->save();
+                }
             }
             
             \DB::commit();
             
-            return redirect()->route('student.evaluations.index')
-                ->with('success', 'Evaluation completed successfully.');
+            // Only send notification if completing the evaluation
+            if (!$request->has('save_draft')) {
+                // Send notification to the student who submitted the work
+                try {
+                    Notification::send($evaluation->submission->user, new EvaluationCompleted($evaluation));
+                } catch (\Exception $e) {
+                    // Log notification error but don't fail the request
+                    \Log::error('Failed to send evaluation notification: ' . $e->getMessage());
+                }
+                
+                return redirect()->route('student.evaluations.index')
+                    ->with('success', 'Evaluation completed successfully.');
+            }
+            
+            return redirect()->route('student.evaluations.edit', $evaluation->id)
+                ->with('success', 'Evaluation draft saved successfully.');
+                
         } catch (\Exception $e) {
             \DB::rollBack();
             
@@ -169,13 +222,13 @@ class EvaluationController extends Controller
                     ->where(function ($q) use ($student) {
                         $q->where('evaluator_id', $student->id)
                             ->orWhereHas('submission', function ($sq) use ($student) {
-                                $sq->where('student_id', $student->id);
+                                $sq->where('user_id', $student->id);
                             });
                     });
             })
             ->with([
                 'evaluator:id,username,first_name,last_name',
-                'submission.student:id,username,first_name,last_name',
+                'submission.user:id,username,first_name,last_name',
                 'submission.brief.criteria',
                 'answers',
                 'feedback',
@@ -202,7 +255,7 @@ class EvaluationController extends Controller
         
         // Ensure the evaluation is for one of the student's submissions
         $evaluation = Evaluation::whereHas('submission', function ($query) use ($student) {
-                $query->where('student_id', $student->id);
+                $query->where('user_id', $student->id);
             })
             ->where('id', $id)
             ->where('status', 'completed')

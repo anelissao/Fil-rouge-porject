@@ -20,7 +20,7 @@ class DashboardController extends Controller
      */
     public function __construct()
     {
-        // No middleware here
+        $this->middleware(['auth', 'role:teacher']);
     }
     
     /**
@@ -28,23 +28,14 @@ class DashboardController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index()
     {
-        // Check if user is logged in and is a teacher
-        if (!Auth::check()) {
-            return redirect('login');
-        }
-
-        $user = Auth::user();
-        if ($user->role !== 'teacher') {
-            return redirect('/')->with('error', 'You must be a teacher to access this page.');
-        }
-        
-        $teacher = $user;
+        $teacher = Auth::user();
         $teacherId = $teacher->id;
         
         // Get statistics
         $totalBriefs = Brief::where('teacher_id', $teacherId)->count();
+        
         $totalSubmissions = Submission::whereHas('brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })->count();
@@ -60,12 +51,15 @@ class DashboardController extends Controller
         ->distinct('user_id')
         ->count('user_id');
         
-        // Get active briefs (published and not past end_date)
+        // Get active briefs (published and not past deadline)
         $activeBriefs = Brief::where('teacher_id', $teacherId)
-            ->wherePublished(true)
-            ->where('end_date', '>=', Carbon::now())
+            ->where('status', 'published')
+            ->where(function($query) {
+                $query->where('deadline', '>=', Carbon::now())
+                      ->orWhereNull('deadline');
+            })
             ->withCount('submissions')
-            ->orderBy('end_date')
+            ->orderBy('deadline')
             ->take(5)
             ->get();
         
@@ -73,7 +67,7 @@ class DashboardController extends Controller
         $recentSubmissions = Submission::whereHas('brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })
-        ->with(['user:id,username,first_name,last_name', 'brief:id,title'])
+        ->with(['student:id,username,first_name,last_name', 'brief:id,title'])
         ->latest()
         ->take(5)
         ->get();
@@ -83,14 +77,23 @@ class DashboardController extends Controller
             $query->where('teacher_id', $teacherId);
         })
         ->where('status', '!=', 'completed')
-        ->with(['evaluator:id,username,first_name,last_name', 'submission.user:id,username,first_name,last_name'])
+        ->with([
+            'evaluator:id,username,first_name,last_name', 
+            'submission.student:id,username,first_name,last_name',
+            'submission.brief:id,title'
+        ])
         ->latest()
         ->take(5)
-        ->get()
-        ->map(function($evaluation) {
-            $evaluation->is_overdue = $evaluation->due_date && $evaluation->due_date->isPast();
-            return $evaluation;
-        });
+        ->get();
+        
+        // Calculate overdue status separately to avoid issues with date casting
+        $now = Carbon::now();
+        foreach ($evaluations as $evaluation) {
+            $evaluation->is_overdue = false;
+            if (!empty($evaluation->due_at)) {
+                $evaluation->is_overdue = Carbon::parse($evaluation->due_at)->isPast();
+            }
+        }
         
         return view('teacher.dashboard', compact(
             'totalBriefs',
