@@ -21,15 +21,7 @@ class ResultsController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware(function ($request, $next) {
-            // Check if the user is a teacher
-            if (Auth::user()->role !== 'teacher') {
-                return redirect('/')->with('error', 'You must be a teacher to access this page.');
-            }
-            
-            return $next($request);
-        });
+        // No middleware here
     }
     
     /**
@@ -37,9 +29,19 @@ class ResultsController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teacher = Auth::user();
+        // Check if user is logged in and is a teacher
+        if (!Auth::check()) {
+            return redirect('login');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
+        $teacher = $user;
         
         // Get all briefs created by the teacher
         $briefs = Brief::where('teacher_id', $teacher->id)
@@ -83,9 +85,19 @@ class ResultsController extends Controller
      * @param int $id
      * @return \Illuminate\View\View
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        $teacher = Auth::user();
+        // Check if user is logged in and is a teacher
+        if (!Auth::check()) {
+            return redirect('login');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
+        $teacher = $user;
         $brief = Brief::where('teacher_id', $teacher->id)->findOrFail($id);
         
         // Get all submissions for this brief with their evaluations
@@ -218,7 +230,17 @@ class ResultsController extends Controller
      */
     public function export(Request $request, $id)
     {
-        $teacher = Auth::user();
+        // Check if user is logged in and is a teacher
+        if (!Auth::check()) {
+            return redirect('login');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
+        $teacher = $user;
         $brief = Brief::where('teacher_id', $teacher->id)->findOrFail($id);
         
         // Validate export options

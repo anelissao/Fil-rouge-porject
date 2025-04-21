@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
+use Illuminate\Support\Facades\Auth;
 
 // Public routes
 Route::get('/', function () {
@@ -46,18 +47,30 @@ Route::middleware(['auth'])->group(function () {
     })->name('briefs.index');
 
     // Student-specific routes
-    Route::middleware(['role:student'])->group(function () {
+    Route::middleware(['auth'])->group(function () {
         // Submissions
         Route::get('/submissions', function() {
+            // Check if user is student
+            if (Auth::user()->role !== 'student') {
+                return redirect('/')->with('error', 'Only students can access this area.');
+            }
             return view('submissions.index');
         })->name('submissions.index');
 
         Route::get('/submissions/create', function() {
+            // Check if user is student
+            if (Auth::user()->role !== 'student') {
+                return redirect('/')->with('error', 'Only students can access this area.');
+            }
             return view('submissions.create');
         })->name('submissions.create');
 
         // Evaluations
         Route::get('/evaluations', function() {
+            // Check if user is student
+            if (Auth::user()->role !== 'student') {
+                return redirect('/')->with('error', 'Only students can access this area.');
+            }
             return view('evaluations.index');
         })->name('evaluations.index');
     });
@@ -96,20 +109,36 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Admin-specific routes
-    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', function() {
+            // Check if user is admin
+            if (Auth::user()->role !== 'admin') {
+                return redirect('/')->with('error', 'Only administrators can access this area.');
+            }
             return view('admin.dashboard');
         })->name('dashboard');
 
         Route::get('/users', function() {
+            // Check if user is admin
+            if (Auth::user()->role !== 'admin') {
+                return redirect('/')->with('error', 'Only administrators can access this area.');
+            }
             return view('admin.users.index');
         })->name('users.index');
 
         Route::get('/briefs', function() {
+            // Check if user is admin
+            if (Auth::user()->role !== 'admin') {
+                return redirect('/')->with('error', 'Only administrators can access this area.');
+            }
             return view('admin.briefs.index');
         })->name('briefs.index');
 
         Route::get('/settings', function() {
+            // Check if user is admin
+            if (Auth::user()->role !== 'admin') {
+                return redirect('/')->with('error', 'Only administrators can access this area.');
+            }
             return view('admin.settings');
         })->name('settings');
     });

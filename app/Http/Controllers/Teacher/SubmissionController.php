@@ -16,15 +16,7 @@ class SubmissionController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware(function ($request, $next) {
-            // Check if the user is a teacher
-            if (Auth::user()->role !== 'teacher') {
-                return redirect('/')->with('error', 'You must be a teacher to access this page.');
-            }
-            
-            return $next($request);
-        });
+        // No middleware here
     }
     
     /**
@@ -32,9 +24,19 @@ class SubmissionController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teacher = Auth::user();
+        // Check if user is logged in and is a teacher
+        if (!Auth::check()) {
+            return redirect('login');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
+        $teacher = $user;
         $submissions = Submission::whereHas('brief', function($query) use ($teacher) {
             $query->where('teacher_id', $teacher->id);
         })
@@ -51,10 +53,20 @@ class SubmissionController extends Controller
      * @param  \App\Models\Submission  $submission
      * @return \Illuminate\View\View
      */
-    public function show(Submission $submission)
+    public function show(Submission $submission, Request $request)
     {
+        // Check if user is logged in and is a teacher
+        if (!Auth::check()) {
+            return redirect('login');
+        }
+
+        $user = Auth::user();
+        if ($user->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
         // Check if submission belongs to teacher's brief
-        $teacher = Auth::user();
+        $teacher = $user;
         if ($submission->brief->teacher_id !== $teacher->id) {
             abort(403, 'Unauthorized action.');
         }
