@@ -86,8 +86,13 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/evaluations', [App\Http\Controllers\Teacher\EvaluationController::class, 'store'])->name('evaluations.store');
         
         // Results
-        Route::get('/results', [App\Http\Controllers\Teacher\ResultController::class, 'index'])->name('results.index');
-        Route::get('/results/{brief}', [App\Http\Controllers\Teacher\ResultController::class, 'show'])->name('results.show');
+        Route::get('/results', [App\Http\Controllers\Teacher\ResultsController::class, 'index'])->name('results.index');
+        Route::get('/results/{id}', [App\Http\Controllers\Teacher\ResultsController::class, 'show'])->name('results.show');
+        Route::get('/results/{id}/export', [App\Http\Controllers\Teacher\ResultsController::class, 'export'])->name('results.export');
+        
+        // Additional evaluation routes
+        Route::post('/evaluations/{evaluation}/remind', [App\Http\Controllers\Teacher\EvaluationController::class, 'sendReminder'])->name('evaluations.remind');
+        Route::post('/evaluations/random', [App\Http\Controllers\Teacher\EvaluationController::class, 'assignRandom'])->name('evaluations.random');
     });
 
     // Admin-specific routes
