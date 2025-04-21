@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BriefController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 
 // Public routes
@@ -38,9 +39,10 @@ Route::middleware(['auth'])->group(function () {
     })->name('dashboard');
 
     // User profile
-    Route::get('/profile', function() {
-        return view('profile.show');
-    })->name('profile.show');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile/avatar', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
 
     // Brief routes (accessible by both teachers and students)
     Route::get('/briefs', [BriefController::class, 'index'])->name('briefs.index');

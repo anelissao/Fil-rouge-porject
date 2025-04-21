@@ -25,6 +25,8 @@ class User extends Authenticatable
         'role',
         'first_name',
         'last_name',
+        'avatar',
+        'bio',
         'google_id',
     ];
 
@@ -47,6 +49,35 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get the user's full name.
+     *
+     * @return string
+     */
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Get the user's avatar URL.
+     *
+     * @return string
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+        
+        // Default avatar based on the first letter of the username
+        $firstLetter = strtoupper(substr($this->username, 0, 1));
+        $colors = ['#1abc9c', '#3498db', '#9b59b6', '#f1c40f', '#e74c3c', '#34495e'];
+        $colorIndex = ord($firstLetter) % count($colors);
+        
+        return "https://ui-avatars.com/api/?name={$firstLetter}&background=" . ltrim($colors[$colorIndex], '#') . "&color=ffffff&size=256";
+    }
 
     public function setPasswordAttribute($value)
     {
