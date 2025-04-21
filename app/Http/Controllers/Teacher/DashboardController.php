@@ -51,21 +51,21 @@ class DashboardController extends Controller
         
         $pendingEvaluations = Evaluation::whereHas('submission.brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
-        })->where('status', 'pending')->count();
+        })->where('status', '!=', 'completed')->count();
         
         // Count active students (students who have submitted to teacher's briefs)
         $activeStudents = Submission::whereHas('brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })
-        ->distinct('student_id')
-        ->count('student_id');
+        ->distinct('user_id')
+        ->count('user_id');
         
-        // Get active briefs (published and not past deadline)
+        // Get active briefs (published and not past end_date)
         $activeBriefs = Brief::where('teacher_id', $teacherId)
-            ->where('status', 'published')
-            ->where('deadline', '>=', Carbon::now())
+            ->wherePublished(true)
+            ->where('end_date', '>=', Carbon::now())
             ->withCount('submissions')
-            ->orderBy('deadline')
+            ->orderBy('end_date')
             ->take(5)
             ->get();
         
@@ -73,7 +73,7 @@ class DashboardController extends Controller
         $recentSubmissions = Submission::whereHas('brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })
-        ->with(['student:id,username,first_name,last_name', 'brief:id,title'])
+        ->with(['user:id,username,first_name,last_name', 'brief:id,title'])
         ->latest()
         ->take(5)
         ->get();
@@ -82,11 +82,15 @@ class DashboardController extends Controller
         $evaluations = Evaluation::whereHas('submission.brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })
-        ->where('status', 'pending')
-        ->with(['evaluator:id,username,first_name,last_name', 'submission.student:id,username,first_name,last_name'])
+        ->where('status', '!=', 'completed')
+        ->with(['evaluator:id,username,first_name,last_name', 'submission.user:id,username,first_name,last_name'])
         ->latest()
         ->take(5)
-        ->get();
+        ->get()
+        ->map(function($evaluation) {
+            $evaluation->is_overdue = $evaluation->due_date && $evaluation->due_date->isPast();
+            return $evaluation;
+        });
         
         return view('teacher.dashboard', compact(
             'totalBriefs',

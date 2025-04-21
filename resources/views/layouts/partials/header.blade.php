@@ -38,17 +38,17 @@
                                 <a href="{{ route('briefs.index') }}" class="nav-link {{ request()->routeIs('briefs.*') ? 'active' : '' }}">Briefs</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('submissions.index') }}" class="nav-link {{ request()->routeIs('submissions.*') ? 'active' : '' }}">My Submissions</a>
+                                <a href="{{ route('student.submissions.index') }}" class="nav-link {{ request()->routeIs('student.submissions.*') ? 'active' : '' }}">My Submissions</a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('evaluations.index') }}" class="nav-link {{ request()->routeIs('evaluations.*') ? 'active' : '' }}">Evaluations</a>
+                                <a href="{{ route('student.evaluations.index') }}" class="nav-link {{ request()->routeIs('student.evaluations.*') ? 'active' : '' }}">Evaluations</a>
                             </li>
                         @endif
 
                         <!-- Teacher Navigation -->
                         @if(auth()->user()->isTeacher())
                             <li class="nav-item">
-                                <a href="{{ route('briefs.index') }}" class="nav-link {{ request()->routeIs('briefs.*') ? 'active' : '' }}">Manage Briefs</a>
+                                <a href="{{ route('teacher.briefs.index') }}" class="nav-link {{ request()->routeIs('teacher.briefs.*') ? 'active' : '' }}">Manage Briefs</a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('teacher.submissions.index') }}" class="nav-link {{ request()->routeIs('teacher.submissions.*') ? 'active' : '' }}">View Submissions</a>

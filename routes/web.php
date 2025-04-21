@@ -49,7 +49,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/briefs/{id}', [BriefController::class, 'show'])->name('briefs.show');
 
     // Student-specific routes
-    Route::middleware(['auth'])->group(function () {
+    Route::middleware(['auth'])->prefix('student')->name('student.')->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [App\Http\Controllers\Student\DashboardController::class, 'index'])->name('dashboard');
+        
         // Submissions
         Route::get('/submissions', function() {
             // Check if user is student
