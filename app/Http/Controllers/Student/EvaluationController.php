@@ -83,7 +83,7 @@ class EvaluationController extends Controller
             
         // Don't allow editing completed evaluations
         if ($evaluation->status === 'completed') {
-            return redirect()->route('evaluations.show', $evaluation->id)
+            return redirect()->route('student.evaluations.show', $evaluation->id)
                 ->with('error', 'This evaluation has already been completed and cannot be edited.');
         }
         
@@ -117,7 +117,7 @@ class EvaluationController extends Controller
             
         // Don't allow editing completed evaluations
         if ($evaluation->status === 'completed') {
-            return redirect()->route('evaluations.show', $evaluation->id)
+            return redirect()->route('student.evaluations.show', $evaluation->id)
                 ->with('error', 'This evaluation has already been completed and cannot be edited.');
         }
         
@@ -180,10 +180,10 @@ class EvaluationController extends Controller
             \DB::commit();
             
             if (isset($validated['is_complete']) && $validated['is_complete']) {
-                return redirect()->route('evaluations.show', $evaluation->id)
+                return redirect()->route('student.evaluations.show', $evaluation->id)
                     ->with('success', 'Evaluation has been completed successfully!');
             } else {
-                return redirect()->route('evaluations.edit', $evaluation->id)
+                return redirect()->route('student.evaluations.edit', $evaluation->id)
                     ->with('success', 'Your progress has been saved.');
             }
         } catch (\Exception $e) {
