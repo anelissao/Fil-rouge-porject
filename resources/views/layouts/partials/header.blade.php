@@ -54,6 +54,9 @@
                                 <a href="{{ route('teacher.submissions.index') }}" class="nav-link {{ request()->routeIs('teacher.submissions.*') ? 'active' : '' }}">View Submissions</a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('teacher.evaluations.index') }}" class="nav-link {{ request()->routeIs('teacher.evaluations.*') ? 'active' : '' }}">Evaluations</a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('teacher.results.index') }}" class="nav-link {{ request()->routeIs('teacher.results.*') ? 'active' : '' }}">Results</a>
                             </li>
                         @endif
