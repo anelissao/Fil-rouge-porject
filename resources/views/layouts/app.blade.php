@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <style>
         :root {
             --primary-color: #1E90FF;
@@ -116,19 +117,14 @@
     </style>
 
     @yield('styles')
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
-<body>
+<body class="font-sans antialiased">
     <!-- Header -->
     @include('layouts.partials.header')
 
     <!-- Page Content -->
-    <main class="main-content">
-        <div class="container">
-            @yield('content')
-        </div>
+    <main>
+        @yield('content')
     </main>
 
     <!-- Footer -->
