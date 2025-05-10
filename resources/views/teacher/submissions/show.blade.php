@@ -3,71 +3,104 @@
 @section('title', 'View Submission')
 
 @section('content')
-<div class="container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Submission Details</h1>
-            <p class="page-subtitle">
-                {{ $submission->student->username }}'s submission for <strong>{{ $submission->brief->title }}</strong>
-            </p>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route('teacher.submissions.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Submissions
-            </a>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section with Gradient Background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg mb-8 p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div class="mb-4 md:mb-0">
+                <nav class="flex mb-2" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="{{ route('home') }}" class="text-blue-200 hover:text-white transition-colors">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-blue-200 mx-2 text-xs"></i>
+                                <a href="{{ route('teacher.submissions.index') }}" class="text-blue-200 hover:text-white transition-colors">
+                                    Submissions
+                                </a>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-blue-200 mx-2 text-xs"></i>
+                                <span class="text-white">Submission Details</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+                <h1 class="text-3xl font-bold text-white mb-2">Submission Details</h1>
+                <p class="text-blue-100">
+                    {{ $submission->student->username }}'s submission for <strong>{{ $submission->brief->title }}</strong>
+                </p>
+            </div>
+            <div>
+                <a href="{{ route('teacher.submissions.index') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Submissions
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="content-grid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- Submission Information Card -->
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="section-title">Submission Information</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Submission Information</h2>
             </div>
-            <div class="card-body">
-                <div class="info-grid">
-                    <div class="info-item">
-                        <span class="info-label">Student</span>
-                        <span class="info-value">{{ $submission->student->username }}</span>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-medium text-white mb-2">Student</h3>
+                        <p class="text-gray-300 mb-4">{{ $submission->student->username }}</p>
+
+                        <h3 class="text-lg font-medium text-white mb-2">Submitted On</h3>
+                        <p class="text-gray-300 mb-4">{{ $submission->created_at->format('M d, Y H:i') }}</p>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">Submitted On</span>
-                        <span class="info-value">{{ $submission->created_at->format('M d, Y H:i') }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Brief</span>
-                        <span class="info-value">{{ $submission->brief->title }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="info-value status-badge completed">Submitted</span>
+                    <div>
+                        <h3 class="text-lg font-medium text-white mb-2">Brief</h3>
+                        <p class="text-gray-300 mb-4">{{ $submission->brief->title }}</p>
+
+                        <h3 class="text-lg font-medium text-white mb-2">Status</h3>
+                        <div class="mb-4">
+                            <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-green-900/30 text-green-400">
+                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-green-400"></span>
+                                Submitted
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Submission Content Card -->
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="section-title">Submission Content</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Submission Content</h2>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 @if($submission->content)
-                    <div class="submission-content">
-                        {!! nl2br(e($submission->content)) !!}
+                    <div class="bg-gray-750 p-4 rounded-lg border border-gray-700 mb-6">
+                        <div class="text-gray-300 whitespace-pre-line">
+                            {!! nl2br(e($submission->content)) !!}
+                        </div>
                     </div>
                 @endif
                 
                 @if($submission->file_path)
-                    <div class="file-attachment">
-                        <h3 class="subsection-title">Attachments</h3>
-                        <div class="attachment-item">
-                            <i class="fas fa-file-alt attachment-icon"></i>
-                            <div class="attachment-details">
-                                <span class="attachment-name">{{ basename($submission->file_path) }}</span>
-                                <span class="attachment-meta">Added {{ $submission->created_at->format('M d, Y') }}</span>
+                    <div class="mt-4">
+                        <h3 class="text-lg font-medium text-white mb-3">Attachments</h3>
+                        <div class="flex items-center p-3 bg-gray-750 rounded-lg border border-gray-700">
+                            <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-900/30 text-blue-400">
+                                <i class="fas fa-file-alt"></i>
                             </div>
-                            <a href="{{ asset('storage/' . $submission->file_path) }}" class="btn-icon download-btn" target="_blank" download>
+                            <div class="ml-3 flex-grow">
+                                <p class="text-sm font-medium text-white">{{ basename($submission->file_path) }}</p>
+                                <p class="text-xs text-gray-400">Added {{ $submission->created_at->format('M d, Y') }}</p>
+                            </div>
+                            <a href="{{ asset('storage/' . $submission->file_path) }}" class="flex-shrink-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors" target="_blank" download>
                                 <i class="fas fa-download"></i>
                             </a>
                         </div>
@@ -75,571 +108,208 @@
                 @endif
             </div>
         </div>
+    </div>
 
-        <!-- Evaluations Card -->
-        <div class="content-card">
-            <div class="card-header">
-                <h2 class="section-title">Evaluations</h2>
-            </div>
-            <div class="card-body">
-                @if(count($submission->evaluations) > 0)
-                    <div class="evaluations-list">
-                        @foreach($submission->evaluations as $evaluation)
-                            <div class="evaluation-item">
-                                <div class="evaluation-header">
-                                    <div class="evaluation-meta">
-                                        <span class="evaluator-name">
-                                            <i class="fas fa-user-check"></i> {{ $evaluation->evaluator->username }}
-                                        </span>
-                                        <span class="evaluation-status {{ $evaluation->status }}">
-                                            {{ ucfirst($evaluation->status) }}
-                                        </span>
+    <!-- Evaluations Card -->
+    <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700 mb-8">
+        <div class="border-b border-gray-700 px-6 py-4">
+            <h2 class="text-xl font-bold text-white">Evaluations</h2>
+        </div>
+        <div class="p-6">
+            @if(count($submission->evaluations) > 0)
+                <div class="space-y-6">
+                    @foreach($submission->evaluations as $evaluation)
+                        <div class="p-4 border rounded-lg 
+                            {{ $evaluation->status == 'completed' ? 'border-green-500/30 bg-green-900/10' : 'border-yellow-500/30 bg-yellow-900/10' }}">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+                                <div>
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-gray-700 text-gray-400">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                        <h3 class="ml-2 text-lg font-medium text-white">
+                                            {{ $evaluation->evaluator->username }}
+                                        </h3>
                                     </div>
-                                    <div class="evaluation-timestamp">
+                                    <p class="text-sm text-gray-400 mt-1">
                                         @if($evaluation->status == 'completed')
                                             Completed on {{ $evaluation->updated_at->format('M d, Y') }}
                                         @else
                                             Assigned on {{ $evaluation->created_at->format('M d, Y') }}
                                         @endif
-                                    </div>
+                                    </p>
                                 </div>
-                                
-                                @if($evaluation->status == 'completed')
-                                    <div class="evaluation-content">
-                                        @if($evaluation->overall_comment)
-                                            <div class="evaluation-comment">
-                                                <h4>Overall Comment</h4>
-                                                <p>{{ $evaluation->overall_comment }}</p>
-                                            </div>
-                                        @endif
-                                        
-                                        @if(isset($evaluation->criteriaScores) && count($evaluation->criteriaScores) > 0)
-                                            <div class="scores-list">
-                                                <h4>Criteria Scores</h4>
-                                                @foreach($evaluation->criteriaScores as $score)
-                                                    <div class="score-item">
-                                                        <div class="score-header">
-                                                            <span class="criterion-name">{{ $score->criterion->name }}</span>
-                                                            <span class="score-value">{{ $score->score }}/10</span>
-                                                        </div>
-                                                        @if($score->comment)
-                                                            <p class="score-comment">{{ $score->comment }}</p>
-                                                        @endif
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        @endif
-                                    </div>
-                                @else
-                                    <div class="pending-message">
-                                        <p>This evaluation is not yet completed.</p>
-                                        <button class="btn btn-primary send-reminder-btn" data-id="{{ $evaluation->id }}">
-                                            <i class="fas fa-bell"></i> Send Reminder
-                                        </button>
-                                    </div>
-                                @endif
+                                <div class="mt-2 sm:mt-0">
+                                    <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center
+                                        {{ $evaluation->status == 'completed' 
+                                            ? 'bg-green-900/30 text-green-400' 
+                                            : 'bg-yellow-900/30 text-yellow-400' }}">
+                                        <span class="w-1.5 h-1.5 rounded-full mr-1.5 
+                                            {{ $evaluation->status == 'completed' 
+                                                ? 'bg-green-400' 
+                                                : 'bg-yellow-400' }}"></span>
+                                        {{ ucfirst($evaluation->status) }}
+                                    </span>
+                                </div>
                             </div>
-                        @endforeach
+                            
+                            @if($evaluation->status == 'completed')
+                                <div class="mt-4 space-y-4">
+                                    @if($evaluation->feedback)
+                                        <div class="p-3 bg-gray-750 rounded-lg border border-gray-700">
+                                            <h4 class="text-md font-semibold text-white">Overall Feedback</h4>
+                                            <div class="mt-2 text-gray-300 whitespace-pre-line">
+                                                {!! nl2br(e($evaluation->feedback)) !!}
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
+                                    @if($evaluation->answers && $evaluation->answers->count() > 0)
+                                        <div class="space-y-3">
+                                            <h4 class="text-md font-semibold text-white">Criteria Evaluation</h4>
+                                            @foreach($evaluation->answers as $answer)
+                                                <div class="p-3 bg-gray-750 rounded-lg border border-gray-700">
+                                                    <h4 class="text-md font-semibold text-white">{{ $answer->criterion->title }}</h4>
+                                                    <p class="text-sm text-gray-400 mt-1">{{ $answer->criterion->description }}</p>
+                                                    
+                                                    <div class="mt-2 flex items-center">
+                                                        <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center
+                                                            {{ $answer->is_valid 
+                                                                ? 'bg-green-900/30 text-green-400' 
+                                                                : 'bg-red-900/30 text-red-400' }}">
+                                                            <span class="w-1.5 h-1.5 rounded-full mr-1.5 
+                                                                {{ $answer->is_valid 
+                                                                    ? 'bg-green-400' 
+                                                                    : 'bg-red-400' }}"></span>
+                                                            {{ $answer->is_valid ? 'Validated' : 'Not Validated' }}
+                                                        </span>
+                                                    </div>
+                                                    
+                                                    @if($answer->comment)
+                                                        <div class="mt-3 text-sm bg-gray-800 p-3 rounded-lg">
+                                                            <p class="font-medium text-white mb-1">Comment:</p>
+                                                            <p class="text-gray-300">{{ $answer->comment }}</p>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <div class="mt-4 p-4 bg-gray-750 rounded-lg border border-gray-700 text-center">
+                                    <p class="text-gray-300 mb-4">This evaluation is not yet completed.</p>
+                                    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors send-reminder-btn" data-id="{{ $evaluation->id }}">
+                                        <i class="fas fa-bell mr-2"></i> Send Reminder
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-16 text-center">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-700 text-gray-500 mb-4">
+                        <i class="fas fa-clipboard-check text-3xl"></i>
                     </div>
-                @else
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-check"></i>
-                        <p>No evaluations have been assigned for this submission yet.</p>
-                        <a href="{{ route('teacher.evaluations.assign') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Assign Evaluation
-                        </a>
-                    </div>
-                @endif
-            </div>
+                    <h3 class="text-xl font-medium text-white mb-2">No evaluations assigned</h3>
+                    <p class="text-gray-400 max-w-md mx-auto mb-6">No evaluations have been assigned for this submission yet.</p>
+                    <a href="{{ route('teacher.evaluations.assign') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i> Assign Evaluation
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
 
     <!-- Reminder Modal -->
-    <div id="reminderModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Send Reminder</h3>
-                <button type="button" class="close-modal">&times;</button>
+    <div id="reminderModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div class="border-b border-gray-700 px-6 py-4 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white">Send Reminder</h3>
+                <button type="button" class="close-modal text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <p>Send a reminder to the evaluator about this evaluation?</p>
-                <div class="form-group">
-                    <label for="reminderMessage">Custom Message (Optional)</label>
-                    <textarea id="reminderMessage" class="form-control" rows="3" placeholder="Add a personal message..."></textarea>
+            <div class="p-6">
+                <p class="text-gray-300 mb-4">Send a reminder to the evaluator about this evaluation?</p>
+                <div class="mb-4">
+                    <label for="reminderMessage" class="block text-sm font-medium text-white mb-2">Custom Message (Optional)</label>
+                    <textarea id="reminderMessage" rows="3" class="block w-full rounded-lg bg-gray-700 border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-white placeholder-gray-400" placeholder="Add a personal message..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline modal-cancel">Cancel</button>
-                <button type="button" class="btn btn-primary reminder-confirm">Send Reminder</button>
+            <div class="border-t border-gray-700 px-6 py-4 flex justify-end space-x-3">
+                <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors modal-cancel">
+                    Cancel
+                </button>
+                <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors reminder-confirm">
+                    Send Reminder
+                </button>
             </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('styles')
-<style>
-    /* Page Layout */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-title {
-        font-size: 1.75rem;
-        margin-bottom: 0.25rem;
-        color: var(--secondary-color);
-    }
-
-    .page-subtitle {
-        color: var(--accent-color);
-    }
-
-    .content-grid {
-        display: grid;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-    }
-
-    /* Content Cards */
-    .content-card {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header {
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .section-title {
-        font-size: 1.25rem;
-        color: var(--secondary-color);
-        margin: 0;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    /* Info Grid */
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-    }
-
-    .info-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .info-label {
-        font-size: 0.875rem;
-        color: var(--accent-color);
-        margin-bottom: 0.375rem;
-    }
-
-    .info-value {
-        font-size: 1rem;
-        color: var(--secondary-color);
-        font-weight: 500;
-    }
-
-    /* Status Badge */
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-        width: fit-content;
-    }
-
-    .status-badge.completed {
-        background-color: rgba(72, 187, 120, 0.1);
-        color: #48BB78;
-    }
-
-    .status-badge.pending {
-        background-color: rgba(236, 201, 75, 0.1);
-        color: #ECC94B;
-    }
-
-    .status-badge.in_progress {
-        background-color: rgba(66, 153, 225, 0.1);
-        color: #4299E1;
-    }
-
-    /* Submission Content */
-    .submission-content {
-        background-color: rgba(255, 255, 255, 0.03);
-        border-radius: 0.375rem;
-        padding: 1.25rem;
-        margin-bottom: 1.5rem;
-        white-space: pre-line;
-        color: var(--secondary-color);
-    }
-
-    /* File Attachment */
-    .subsection-title {
-        font-size: 1.125rem;
-        color: var(--secondary-color);
-        margin-bottom: 1rem;
-    }
-
-    .attachment-item {
-        display: flex;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.03);
-        border-radius: 0.375rem;
-        padding: 0.75rem 1rem;
-    }
-
-    .attachment-icon {
-        font-size: 1.25rem;
-        color: var(--primary-color);
-        margin-right: 0.75rem;
-    }
-
-    .attachment-details {
-        flex: 1;
-    }
-
-    .attachment-name {
-        display: block;
-        font-weight: 500;
-        color: var(--secondary-color);
-        margin-bottom: 0.25rem;
-    }
-
-    .attachment-meta {
-        display: block;
-        font-size: 0.75rem;
-        color: var(--accent-color);
-    }
-
-    .download-btn {
-        color: var(--primary-color);
-    }
-
-    /* Evaluations */
-    .evaluations-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .evaluation-item {
-        background-color: rgba(255, 255, 255, 0.03);
-        border-radius: 0.375rem;
-        overflow: hidden;
-    }
-
-    .evaluation-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem 1.25rem;
-        background-color: rgba(0, 0, 0, 0.1);
-    }
-
-    .evaluation-meta {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .evaluator-name {
-        font-weight: 500;
-        color: var(--secondary-color);
-    }
-
-    .evaluation-status {
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .evaluation-status.completed {
-        background-color: rgba(72, 187, 120, 0.1);
-        color: #48BB78;
-    }
-
-    .evaluation-status.pending {
-        background-color: rgba(236, 201, 75, 0.1);
-        color: #ECC94B;
-    }
-
-    .evaluation-timestamp {
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    .evaluation-content {
-        padding: 1.25rem;
-    }
-
-    .evaluation-comment {
-        margin-bottom: 1.5rem;
-    }
-
-    .evaluation-comment h4 {
-        font-size: 1rem;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-    }
-
-    .evaluation-comment p {
-        color: var(--secondary-color);
-        white-space: pre-line;
-    }
-
-    .scores-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .scores-list h4 {
-        font-size: 1rem;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-    }
-
-    .score-item {
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-        padding-top: 1rem;
-    }
-
-    .score-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-
-    .criterion-name {
-        font-weight: 500;
-        color: var(--secondary-color);
-    }
-
-    .score-value {
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    .score-comment {
-        color: var(--secondary-color);
-        font-size: 0.875rem;
-    }
-
-    .pending-message {
-        padding: 1.25rem;
-        text-align: center;
-        color: var(--accent-color);
-    }
-
-    /* Empty State */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-        text-align: center;
-        color: var(--accent-color);
-    }
-
-    .empty-state i {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        color: var(--accent-color);
-    }
-
-    .empty-state p {
-        margin-bottom: 1rem;
-    }
-
-    /* Modal Styles */
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .modal-title {
-        font-size: 1.25rem;
-        color: var(--secondary-color);
-        margin: 0;
-    }
-
-    .close-modal {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: var(--accent-color);
-        cursor: pointer;
-    }
-
-    .modal-body {
-        padding: 1.5rem;
-        color: var(--secondary-color);
-    }
-
-    .form-group {
-        margin-top: 1rem;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(229, 231, 235, 0.2);
-        border-radius: 0.375rem;
-        color: var(--secondary-color);
-        font-family: inherit;
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        padding: 1.25rem 1.5rem;
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .header-actions {
-            width: 100%;
-        }
-
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .evaluation-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-    }
-</style>
-@endsection
-
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Reminder modal functionality
         const reminderModal = document.getElementById('reminderModal');
-        const reminderBtns = document.querySelectorAll('.send-reminder-btn');
-        const reminderCancel = document.querySelector('.modal-cancel');
-        const reminderConfirm = document.querySelector('.reminder-confirm');
-        const closeReminderBtn = document.querySelector('.close-modal');
-        let currentEvalId = null;
+        const reminderButtons = document.querySelectorAll('.send-reminder-btn');
+        const closeModalButton = document.querySelector('.close-modal');
+        const cancelButton = document.querySelector('.modal-cancel');
+        const confirmButton = document.querySelector('.reminder-confirm');
+        let currentEvaluationId = null;
 
-        reminderBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                currentEvalId = this.dataset.id;
-                reminderModal.style.display = 'flex';
+        // Open modal
+        reminderButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                currentEvaluationId = this.getAttribute('data-id');
+                reminderModal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
             });
         });
 
-        if (reminderCancel) {
-            reminderCancel.addEventListener('click', function() {
-                reminderModal.style.display = 'none';
-                currentEvalId = null;
-            });
-        }
+        // Close modal functions
+        const closeModal = () => {
+            reminderModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            document.getElementById('reminderMessage').value = '';
+            currentEvaluationId = null;
+        };
 
-        if (closeReminderBtn) {
-            closeReminderBtn.addEventListener('click', function() {
-                reminderModal.style.display = 'none';
-                currentEvalId = null;
-            });
-        }
+        closeModalButton.addEventListener('click', closeModal);
+        cancelButton.addEventListener('click', closeModal);
 
-        if (reminderConfirm) {
-            reminderConfirm.addEventListener('click', function() {
-                if (currentEvalId) {
-                    const message = document.getElementById('reminderMessage').value;
-                    
-                    // Send reminder via AJAX
-                    fetch(`/teacher/evaluations/${currentEvalId}/remind`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ message: message })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Reminder sent successfully!');
-                        } else {
-                            alert('Failed to send reminder.');
-                        }
-                        reminderModal.style.display = 'none';
-                        currentEvalId = null;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        reminderModal.style.display = 'none';
-                        currentEvalId = null;
-                    });
+        // Send reminder
+        confirmButton.addEventListener('click', function() {
+            if (!currentEvaluationId) return;
+            
+            const message = document.getElementById('reminderMessage').value;
+            
+            // Send AJAX request
+            fetch(`/teacher/evaluations/${currentEvaluationId}/remind`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success notification
+                    alert('Reminder sent successfully!');
+                    closeModal();
+                } else {
+                    alert('Failed to send reminder: ' + (data.message || 'Unknown error'));
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while sending the reminder.');
             });
-        }
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(e) {
-            if (e.target === reminderModal) {
-                reminderModal.style.display = 'none';
-                currentEvalId = null;
-            }
         });
     });
 </script>

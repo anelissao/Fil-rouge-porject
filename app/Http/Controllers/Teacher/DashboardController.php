@@ -14,22 +14,17 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
     /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware(['auth', 'role:teacher']);
-    }
-    
-    /**
      * Display the teacher dashboard with relevant statistics and data.
      *
      * @return \Illuminate\View\View
      */
     public function index()
     {
+        // Check if user is a teacher
+        if (Auth::user()->role !== 'teacher') {
+            return redirect('/')->with('error', 'You must be a teacher to access this page.');
+        }
+        
         $teacher = Auth::user();
         $teacherId = $teacher->id;
         
@@ -48,8 +43,8 @@ class DashboardController extends Controller
         $activeStudents = Submission::whereHas('brief', function($query) use ($teacherId) {
             $query->where('teacher_id', $teacherId);
         })
-        ->distinct('user_id')
-        ->count('user_id');
+        ->distinct('student_id')
+        ->count('student_id');
         
         // Get active briefs (published and not past deadline)
         $activeBriefs = Brief::where('teacher_id', $teacherId)
