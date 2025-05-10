@@ -79,7 +79,7 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </a>
-                            <ul class="absolute right-0 hidden group-hover:block mt-2 py-2 w-48 bg-highlight rounded-lg shadow-lg z-10">
+                            <ul class="absolute right-0 mt-2 py-2 w-48 bg-highlight rounded-lg shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible hover:opacity-100 hover:visible transition-all duration-300">
                                 <li>
                                     <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-white hover:bg-gray-750 hover:text-primary transition-colors">Profile</a>
                                 </li>
