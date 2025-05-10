@@ -3,84 +3,109 @@
 @section('title', 'Submissions')
 
 @section('content')
-<div class="container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Submissions Management</h1>
-            <p class="page-subtitle">View and manage student submissions</p>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route('teacher.dashboard') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section with Gradient Background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg mb-8 p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-white mb-2">Submissions Management</h1>
+                <p class="text-blue-100">View and manage student submissions</p>
+            </div>
+            <div>
+                <a href="{{ route('teacher.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="content-card">
-        <div class="card-header">
-            <div class="filter-controls">
-                <div class="search-wrapper">
-                    <input type="text" id="submissionSearch" class="search-input" placeholder="Search submissions...">
-                    <i class="fas fa-search search-icon"></i>
+    <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+        <div class="border-b border-gray-700 px-6 py-4">
+            <div class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="submissionSearch" 
+                            placeholder="Search submissions..." 
+                            class="pl-10 pr-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-white"
+                        >
+                        <div class="absolute left-3 top-2.5 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="filter-dropdown">
-                    <select id="briefFilter" class="filter-select">
-                        <option value="all">All Briefs</option>
-                        @foreach($briefs ?? [] as $brief)
-                            <option value="{{ $brief->id }}">{{ $brief->title }}</option>
-                        @endforeach
-                    </select>
-                    <label for="briefFilter">Brief</label>
+                <div class="w-full md:w-48">
+                    <div class="relative">
+                        <select id="briefFilter" class="pl-3 pr-10 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-white appearance-none">
+                            <option value="all">All Briefs</option>
+                            @foreach($briefs ?? [] as $brief)
+                                <option value="{{ $brief->id }}">{{ $brief->title }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <div class="submissions-table-container">
-            <table class="submissions-table">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-700">
                 <thead>
                     <tr>
-                        <th>Student</th>
-                        <th>Brief</th>
-                        <th>Submitted At</th>
-                        <th>Status</th>
-                        <th>Evaluations</th>
-                        <th>Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Brief</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Submitted At</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Evaluations</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-700">
                     @forelse($submissions as $submission)
-                        <tr>
-                            <td>
-                                {{ $submission->student->username }}
+                        <tr class="hover:bg-gray-750 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-gray-700 text-gray-400">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-white">{{ $submission->student->username }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td>
-                                {{ $submission->brief->title }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-white">{{ $submission->brief->title }}</div>
                             </td>
-                            <td>
-                                {{ $submission->created_at->format('M d, Y') }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-200">{{ $submission->created_at->format('M d, Y') }}</div>
                             </td>
-                            <td>
-                                <span class="status-badge completed">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-green-900/30 text-green-400">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-green-400"></span>
                                     Submitted
                                 </span>
                             </td>
-                            <td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                                 {{ $submission->evaluations_count ?? $submission->evaluations->count() }} evaluations
                             </td>
-                            <td class="actions-cell">
-                                <a href="{{ route('teacher.submissions.show', $submission->id) }}" class="btn-icon" title="View Submission">
-                                    <i class="fas fa-eye"></i>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <a href="{{ route('teacher.submissions.show', $submission->id) }}" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                    <i class="fas fa-eye mr-1"></i>View
                                 </a>
                             </td>
                         </tr>
                     @empty
-                        <tr class="empty-row">
-                            <td colspan="6" class="empty-table">
-                                <div class="empty-state">
-                                    <i class="fas fa-file-upload"></i>
-                                    <p>No submissions found.</p>
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-700 text-gray-500 mb-4">
+                                    <i class="fas fa-file-upload text-3xl"></i>
                                 </div>
+                                <p class="text-lg font-medium text-white mb-2">No submissions found</p>
+                                <p class="text-gray-400 max-w-md mx-auto">There are no student submissions available at the moment.</p>
                             </td>
                         </tr>
                     @endforelse
@@ -88,263 +113,40 @@
             </table>
         </div>
         
-        <div class="pagination-container">
+        <div class="px-6 py-4 border-t border-gray-700">
             {{ $submissions->links() }}
         </div>
     </div>
 </div>
-@endsection
 
-@section('styles')
-<style>
-    /* Page Layout */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-title {
-        font-size: 1.75rem;
-        margin-bottom: 0.25rem;
-        color: var(--secondary-color);
-    }
-
-    .page-subtitle {
-        color: var(--accent-color);
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    /* Content Card */
-    .content-card {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    /* Filter Controls */
-    .filter-controls {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.25rem;
-        flex-wrap: wrap;
-    }
-
-    .search-wrapper {
-        position: relative;
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .search-input {
-        padding: 0.65rem 0.75rem;
-        padding-left: 2.5rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(229, 231, 235, 0.2);
-        border-radius: 0.375rem;
-        color: var(--secondary-color);
-        width: 100%;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 0.85rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--accent-color);
-    }
-
-    .filter-dropdown {
-        position: relative;
-    }
-
-    .filter-select {
-        padding: 0.65rem 2.5rem 0.65rem 0.75rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(229, 231, 235, 0.2);
-        border-radius: 0.375rem;
-        color: var(--secondary-color);
-        appearance: none;
-        min-width: 150px;
-        cursor: pointer;
-    }
-
-    .filter-dropdown label {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--accent-color);
-        font-size: 0.75rem;
-        pointer-events: none;
-    }
-
-    /* Table Styles */
-    .submissions-table-container {
-        overflow-x: auto;
-    }
-
-    .submissions-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .submissions-table th {
-        text-align: left;
-        padding: 1rem 1.25rem;
-        font-weight: 600;
-        color: var(--secondary-color);
-        white-space: nowrap;
-    }
-
-    .submissions-table td {
-        padding: 1rem 1.25rem;
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-        color: var(--secondary-color);
-    }
-
-    .submissions-table tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.03);
-    }
-
-    .actions-cell {
-        white-space: nowrap;
-        text-align: right;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .status-badge.completed {
-        background-color: rgba(72, 187, 120, 0.1);
-        color: #48BB78;
-    }
-
-    /* Empty State */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem 1rem;
-        text-align: center;
-        color: var(--accent-color);
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1.5rem;
-        color: var(--accent-color);
-    }
-
-    .empty-state p {
-        margin-bottom: 1.5rem;
-    }
-
-    /* Pagination */
-    .pagination-container {
-        padding: 1.5rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    /* Button Styles */
-    .btn-icon {
-        background: none;
-        border: none;
-        padding: 0.5rem;
-        margin-left: 0.5rem;
-        font-size: 0.95rem;
-        color: var(--accent-color);
-        cursor: pointer;
-        border-radius: 0.25rem;
-        transition: all 0.2s;
-    }
-
-    .btn-icon:hover {
-        color: var(--primary-color);
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .header-actions {
-            width: 100%;
-        }
-
-        .filter-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-    }
-</style>
-@endsection
-
-@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality
         const searchInput = document.getElementById('submissionSearch');
         const briefFilter = document.getElementById('briefFilter');
-        const rows = document.querySelectorAll('.submissions-table tbody tr:not(.empty-row)');
-
-        function filterTable() {
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        // Search functionality
+        searchInput.addEventListener('keyup', filterSubmissions);
+        briefFilter.addEventListener('change', filterSubmissions);
+        
+        function filterSubmissions() {
             const searchTerm = searchInput.value.toLowerCase();
-            const briefValue = briefFilter.value;
+            const briefId = briefFilter.value;
             
-            let hasVisibleRows = false;
-            
-            rows.forEach(row => {
-                const rowText = row.textContent.toLowerCase();
-                const briefId = row.dataset.brief;
+            tableRows.forEach(row => {
+                const studentName = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+                const briefTitle = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                const rowBriefId = row.dataset.briefId;
                 
-                const matchesSearch = rowText.includes(searchTerm);
-                const matchesBrief = briefValue === 'all' || briefId === briefValue;
+                const matchesSearch = studentName.includes(searchTerm) || briefTitle.includes(searchTerm);
+                const matchesBrief = briefId === 'all' || rowBriefId === briefId;
                 
-                const shouldShow = matchesSearch && matchesBrief;
-                
-                row.style.display = shouldShow ? '' : 'none';
-                
-                if (shouldShow) {
-                    hasVisibleRows = true;
+                if (matchesSearch && matchesBrief) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
             });
-            
-            // Show empty message if no matches
-            const emptyRow = document.querySelector('.empty-row');
-            if (emptyRow) {
-                emptyRow.style.display = hasVisibleRows ? 'none' : '';
-            }
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', filterTable);
-        }
-        
-        if (briefFilter) {
-            briefFilter.addEventListener('change', filterTable);
         }
     });
 </script>

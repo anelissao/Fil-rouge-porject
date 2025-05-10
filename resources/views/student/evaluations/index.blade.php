@@ -111,14 +111,14 @@
                 </div>
             @endif
         </div>
-        
+
         <!-- Received Tab -->
         <div id="received" class="tab-pane hidden">
             @if(isset($receivedEvaluations) && count($receivedEvaluations) > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($receivedEvaluations as $evaluation)
                         <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden transform hover:scale-[1.02] transition-all duration-300 border-l-4 border-green-500">
-                            <div class="p-6">
+                <div class="p-6">
                                 <div class="flex justify-between items-start">
                                     <h3 class="text-xl font-bold text-white mb-2 truncate">{{ $evaluation->submission->brief->title }}</h3>
                                     <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-green-900/30 text-green-400">
@@ -191,7 +191,7 @@
         
         <!-- All Evaluations Tab -->
         <div id="all" class="tab-pane hidden">
-            @if(count($evaluations) > 0)
+                    @if(count($evaluations) > 0)
                 <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
                     <div class="border-b border-gray-700 px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
@@ -269,7 +269,7 @@
                                                         ($evaluation->is_overdue ? 'Overdue' : 
                                                             ($evaluation->status == 'in_progress' ? 'In Progress' : 'Pending')) 
                                                     }}
-                                                </span>
+                                                    </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm 
                                                 {{ $evaluation->is_overdue ? 'text-red-400' : 'text-gray-200' }}">
@@ -291,10 +291,10 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         @if($evaluations->hasPages())
                             <div class="mt-6">
-                                {{ $evaluations->links() }}
+                            {{ $evaluations->links() }}
                             </div>
                         @endif
                     </div>
@@ -306,11 +306,11 @@
                     </div>
                     <h3 class="text-lg font-medium text-white mb-2">No evaluations found</h3>
                     <p class="text-gray-400 max-w-md mx-auto">You don't have any evaluations assigned to you or received yet.</p>
+                        </div>
+                    @endif
                 </div>
-            @endif
+            </div>
         </div>
-    </div>
-</div>
 
 @section('scripts')
 <script>

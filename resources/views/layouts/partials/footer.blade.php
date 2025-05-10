@@ -1,141 +1,48 @@
-<footer class="site-footer">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3 class="footer-title">Debriefing.com</h3>
-                <p>A collaborative learning platform for students and teachers to work together on projects and provide peer evaluations.</p>
+<footer class="bg-highlight py-12 mt-auto">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+                <h3 class="text-xl font-semibold text-primary mb-4 pb-2 border-b-2 border-primary inline-block">Debriefing.com</h3>
+                <p class="text-white">A collaborative learning platform for students and teachers to work together on projects and provide peer evaluations.</p>
             </div>
             
-            <div class="footer-section">
-                <h3 class="footer-title">Quick Links</h3>
-                <ul class="footer-links">
-                    <li><a href="{{ route('home') }}">Home</a></li>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Contact</a></li>
-                    <li><a href="#">FAQ</a></li>
+            <div>
+                <h3 class="text-xl font-semibold text-primary mb-4 pb-2 border-b-2 border-primary inline-block">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li><a href="{{ route('home') }}" class="text-accent hover:text-primary transition-colors">Home</a></li>
+                    <li><a href="#" class="text-accent hover:text-primary transition-colors">About Us</a></li>
+                    <li><a href="#" class="text-accent hover:text-primary transition-colors">Contact</a></li>
+                    <li><a href="#" class="text-accent hover:text-primary transition-colors">FAQ</a></li>
                 </ul>
             </div>
             
-            <div class="footer-section">
-                <h3 class="footer-title">Contact</h3>
-                <ul class="footer-contact">
-                    <li><i class="fas fa-envelope"></i> info@debriefing.com</li>
-                    <li><i class="fas fa-phone"></i> +212 5XX-XXXXXX</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Marrakech, Morocco</li>
+            <div>
+                <h3 class="text-xl font-semibold text-primary mb-4 pb-2 border-b-2 border-primary inline-block">Contact</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-center text-accent">
+                        <i class="fas fa-envelope mr-2 text-primary"></i>
+                        info@debriefing.com
+                    </li>
+                    <li class="flex items-center text-accent">
+                        <i class="fas fa-phone mr-2 text-primary"></i>
+                        +212 5XX-XXXXXX
+                    </li>
+                    <li class="flex items-center text-accent">
+                        <i class="fas fa-map-marker-alt mr-2 text-primary"></i>
+                        Marrakech, Morocco
+                    </li>
                 </ul>
             </div>
         </div>
         
-        <div class="footer-bottom">
-            <div class="copyright">
+        <div class="border-t border-gray-700 pt-6 flex flex-col md:flex-row md:justify-between md:items-center">
+            <div class="text-accent text-sm mb-4 md:mb-0">
                 &copy; {{ date('Y') }} Debriefing.com. All rights reserved.
             </div>
-            <div class="legal-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+            <div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+                <a href="#" class="text-accent hover:text-primary transition-colors text-sm">Privacy Policy</a>
+                <a href="#" class="text-accent hover:text-primary transition-colors text-sm">Terms of Service</a>
             </div>
         </div>
     </div>
-</footer>
-
-<style>
-    .site-footer {
-        background-color: var(--highlight-color);
-        padding: 3rem 0 1.5rem;
-        margin-top: auto;
-    }
-
-    .footer-content {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
-    .footer-title {
-        color: var(--primary-color);
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
-        position: relative;
-        padding-bottom: 0.5rem;
-    }
-
-    .footer-title::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 50px;
-        height: 2px;
-        background-color: var(--primary-color);
-    }
-
-    .footer-links, .footer-contact {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .footer-links li, .footer-contact li {
-        margin-bottom: 0.5rem;
-    }
-
-    .footer-links a, .footer-contact li {
-        color: var(--accent-color);
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-
-    .footer-links a:hover {
-        color: var(--primary-color);
-    }
-
-    .footer-bottom {
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-        padding-top: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .copyright {
-        color: var(--accent-color);
-        font-size: 0.9rem;
-    }
-
-    .legal-links {
-        display: flex;
-        gap: 1.5rem;
-    }
-
-    .legal-links a {
-        color: var(--accent-color);
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.3s;
-    }
-
-    .legal-links a:hover {
-        color: var(--primary-color);
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-        .footer-content {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        .footer-bottom {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-        }
-
-        .legal-links {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-    }
-</style> 
+</footer> 

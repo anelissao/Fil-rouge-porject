@@ -1,32 +1,32 @@
-<header class="site-header">
-    <div class="container">
-        <div class="header-wrapper">
-            <div class="logo">
-                <a href="{{ route('home') }}">
-                    <span class="logo-text">Debriefing.com</span>
+<header class="bg-highlight sticky top-0 z-50 shadow-md py-4">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+            <div class="flex-shrink-0">
+                <a href="{{ route('home') }}" class="flex items-center">
+                    <span class="text-2xl font-bold text-primary">Debriefing.com</span>
                 </a>
             </div>
 
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation Menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <button class="lg:hidden flex flex-col space-y-1.5" id="mobileMenuToggle" aria-label="Toggle Navigation Menu">
+                <span class="block w-6 h-0.5 bg-white"></span>
+                <span class="block w-6 h-0.5 bg-white"></span>
+                <span class="block w-6 h-0.5 bg-white"></span>
             </button>
 
-            <nav class="main-navigation" id="mainNavigation">
-                <ul class="nav-list">
+            <nav class="hidden lg:flex" id="mainNavigation">
+                <ul class="flex items-center space-x-6">
                     <!-- Navigation items shown to all users -->
-                    <li class="nav-item">
-                        <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
+                    <li>
+                        <a href="{{ route('home') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('home') ? 'text-primary' : '' }}">Home</a>
                     </li>
 
                     <!-- Guest Navigation -->
                     @guest
-                        <li class="nav-item">
-                            <a href="{{ route('login') }}" class="nav-link {{ request()->routeIs('login') ? 'active' : '' }}">Login</a>
+                        <li>
+                            <a href="{{ route('login') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('login') ? 'text-primary' : '' }}">Login</a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('register') }}" class="nav-link {{ request()->routeIs('register') ? 'active' : '' }}">Register</a>
+                        <li>
+                            <a href="{{ route('register') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('register') ? 'text-primary' : '' }}">Register</a>
                         </li>
                     @endguest
 
@@ -34,56 +34,59 @@
                     @auth
                         <!-- Student Navigation -->
                         @if(auth()->user()->isStudent())
-                            <li class="nav-item">
-                                <a href="{{ route('briefs.index') }}" class="nav-link {{ request()->routeIs('briefs.*') ? 'active' : '' }}">Briefs</a>
+                            <li>
+                                <a href="{{ route('briefs.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('briefs.*') ? 'text-primary' : '' }}">Briefs</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('student.submissions.index') }}" class="nav-link {{ request()->routeIs('student.submissions.*') ? 'active' : '' }}">My Submissions</a>
+                            <li>
+                                <a href="{{ route('student.submissions.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('student.submissions.*') ? 'text-primary' : '' }}">My Submissions</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('student.evaluations.index') }}" class="nav-link {{ request()->routeIs('student.evaluations.*') ? 'active' : '' }}">Evaluations</a>
+                            <li>
+                                <a href="{{ route('student.evaluations.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('student.evaluations.*') ? 'text-primary' : '' }}">Evaluations</a>
                             </li>
                         @endif
 
                         <!-- Teacher Navigation -->
                         @if(auth()->user()->isTeacher())
-                            <li class="nav-item">
-                                <a href="{{ route('teacher.briefs.index') }}" class="nav-link {{ request()->routeIs('teacher.briefs.*') ? 'active' : '' }}">Manage Briefs</a>
+                            <li>
+                                <a href="{{ route('teacher.briefs.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.briefs.*') ? 'text-primary' : '' }}">Manage Briefs</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('teacher.submissions.index') }}" class="nav-link {{ request()->routeIs('teacher.submissions.*') ? 'active' : '' }}">View Submissions</a>
+                            <li>
+                                <a href="{{ route('teacher.submissions.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.submissions.*') ? 'text-primary' : '' }}">View Submissions</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('teacher.evaluations.index') }}" class="nav-link {{ request()->routeIs('teacher.evaluations.*') ? 'active' : '' }}">Evaluations</a>
+                            <li>
+                                <a href="{{ route('teacher.evaluations.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.evaluations.*') ? 'text-primary' : '' }}">Evaluations</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('teacher.results.index') }}" class="nav-link {{ request()->routeIs('teacher.results.*') ? 'active' : '' }}">Results</a>
+                            <li>
+                                <a href="{{ route('teacher.results.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.results.*') ? 'text-primary' : '' }}">Results</a>
                             </li>
                         @endif
 
                         <!-- Admin Navigation -->
                         @if(auth()->user()->isAdmin())
-                            <li class="nav-item">
-                                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.*') ? 'active' : '' }}">Admin Dashboard</a>
+                            <li>
+                                <a href="{{ route('admin.dashboard') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('admin.*') ? 'text-primary' : '' }}">Admin Dashboard</a>
                             </li>
-                            <li class="nav-item">
-                                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Manage Users</a>
+                            <li>
+                                <a href="{{ route('admin.users.index') }}" class="font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('admin.users.*') ? 'text-primary' : '' }}">Manage Users</a>
                             </li>
                         @endif
 
                         <!-- User Dropdown -->
-                        <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" id="userDropdown">
+                        <li class="relative group">
+                            <a href="#" class="flex items-center font-medium text-white hover:text-primary transition-colors" id="userDropdown">
                                 {{ auth()->user()->username }}
+                                <svg class="ml-1 w-4 h-4 transition-transform group-hover:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="absolute right-0 hidden group-hover:block mt-2 py-2 w-48 bg-highlight rounded-lg shadow-lg z-10">
                                 <li>
-                                    <a href="{{ route('profile.show') }}" class="dropdown-item">Profile</a>
+                                    <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-white hover:bg-gray-750 hover:text-primary transition-colors">Profile</a>
                                 </li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
-                                        <button type="submit" class="dropdown-item">Logout</button>
+                                        <button type="submit" class="w-full text-left px-4 py-2 text-white hover:bg-gray-750 hover:text-primary transition-colors">Logout</button>
                                     </form>
                                 </li>
                             </ul>
@@ -95,201 +98,108 @@
     </div>
 </header>
 
-<style>
-    .site-header {
-        background-color: var(--highlight-color);
-        padding: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
+<!-- Mobile Menu (Hidden by default) -->
+<div id="mobileMenu" class="fixed inset-0 bg-background bg-opacity-95 z-50 transform translate-x-full transition-transform duration-300 lg:hidden">
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <span class="text-2xl font-bold text-primary">Debriefing.com</span>
+            </div>
+            <button id="mobileMenuClose" class="text-white hover:text-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <nav>
+            <ul class="space-y-4">
+                <!-- Navigation items shown to all users -->
+                <li>
+                    <a href="{{ route('home') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('home') ? 'text-primary' : '' }}">Home</a>
+                </li>
 
-    .header-wrapper {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+                <!-- Guest Navigation -->
+                @guest
+                    <li>
+                        <a href="{{ route('login') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('login') ? 'text-primary' : '' }}">Login</a>
+                    </li>
+                    <li>
+                        <a href="{{ route('register') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('register') ? 'text-primary' : '' }}">Register</a>
+                    </li>
+                @endguest
 
-    .logo a {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        color: var(--secondary-color);
-    }
+                <!-- Authenticated User Navigation -->
+                @auth
+                    <!-- Student Navigation -->
+                    @if(auth()->user()->isStudent())
+                        <li>
+                            <a href="{{ route('briefs.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('briefs.*') ? 'text-primary' : '' }}">Briefs</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('student.submissions.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('student.submissions.*') ? 'text-primary' : '' }}">My Submissions</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('student.evaluations.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('student.evaluations.*') ? 'text-primary' : '' }}">Evaluations</a>
+                        </li>
+                    @endif
 
-    .logo-text {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-    }
+                    <!-- Teacher Navigation -->
+                    @if(auth()->user()->isTeacher())
+                        <li>
+                            <a href="{{ route('teacher.briefs.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.briefs.*') ? 'text-primary' : '' }}">Manage Briefs</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('teacher.submissions.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.submissions.*') ? 'text-primary' : '' }}">View Submissions</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('teacher.evaluations.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.evaluations.*') ? 'text-primary' : '' }}">Evaluations</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('teacher.results.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('teacher.results.*') ? 'text-primary' : '' }}">Results</a>
+                        </li>
+                    @endif
 
-    .main-navigation {
-        display: flex;
-    }
+                    <!-- Admin Navigation -->
+                    @if(auth()->user()->isAdmin())
+                        <li>
+                            <a href="{{ route('admin.dashboard') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('admin.*') ? 'text-primary' : '' }}">Admin Dashboard</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.users.index') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors {{ request()->routeIs('admin.users.*') ? 'text-primary' : '' }}">Manage Users</a>
+                        </li>
+                    @endif
 
-    .nav-list {
-        display: flex;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        align-items: center;
-    }
-
-    .nav-item {
-        margin-left: 1.5rem;
-        position: relative;
-    }
-
-    .nav-link {
-        color: var(--secondary-color);
-        text-decoration: none;
-        font-weight: 500;
-        padding: 0.5rem 0;
-        transition: color 0.3s;
-        display: block;
-    }
-
-    .nav-link:hover, .nav-link.active {
-        color: var(--primary-color);
-    }
-
-    .dropdown-toggle {
-        display: flex;
-        align-items: center;
-    }
-
-    .dropdown-toggle::after {
-        content: '';
-        display: inline-block;
-        width: 0.4rem;
-        height: 0.4rem;
-        margin-left: 0.5rem;
-        border-right: 2px solid var(--secondary-color);
-        border-bottom: 2px solid var(--secondary-color);
-        transform: rotate(45deg);
-    }
-
-    .dropdown-menu {
-        position: absolute;
-        right: 0;
-        top: 100%;
-        background-color: var(--highlight-color);
-        border-radius: 0.25rem;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        min-width: 180px;
-        padding: 0.5rem 0;
-        display: none;
-        z-index: 10;
-    }
-
-    .nav-item.dropdown:hover .dropdown-menu {
-        display: block;
-    }
-
-    .dropdown-item {
-        display: block;
-        padding: 0.5rem 1rem;
-        color: var(--secondary-color);
-        text-decoration: none;
-        transition: background-color 0.3s;
-        border: none;
-        background: none;
-        width: 100%;
-        text-align: left;
-        cursor: pointer;
-        font-size: 0.9rem;
-    }
-
-    .dropdown-item:hover {
-        background-color: var(--primary-color);
-        color: var(--secondary-color);
-    }
-
-    .mobile-menu-toggle {
-        display: none;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.5rem;
-    }
-
-    .mobile-menu-toggle span {
-        display: block;
-        width: 25px;
-        height: 3px;
-        background-color: var(--secondary-color);
-        margin: 5px 0;
-        transition: transform 0.3s, opacity 0.3s;
-    }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-        .header-wrapper {
-            flex-wrap: wrap;
-        }
-
-        .mobile-menu-toggle {
-            display: block;
-            order: 3;
-        }
-
-        .main-navigation {
-            flex-basis: 100%;
-            order: 4;
-            display: none;
-        }
-
-        .main-navigation.active {
-            display: block;
-            margin-top: 1rem;
-        }
-
-        .nav-list {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .nav-item {
-            margin-left: 0;
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-
-        .dropdown-menu {
-            position: static;
-            box-shadow: none;
-            padding-left: 1rem;
-            display: none;
-        }
-
-        .nav-item.dropdown.active .dropdown-menu {
-            display: block;
-        }
-    }
-</style>
+                    <!-- User Profile Link -->
+                    <li class="pt-4 mt-4 border-t border-gray-700">
+                        <a href="{{ route('profile.show') }}" class="block text-lg font-medium text-white hover:text-primary transition-colors">Profile</a>
+                    </li>
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="block w-full text-left text-lg font-medium text-white hover:text-primary transition-colors">Logout</button>
+                        </form>
+                    </li>
+                @endauth
+            </ul>
+        </nav>
+    </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const mainNavigation = document.getElementById('mainNavigation');
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const mobileMenu = document.getElementById('mobileMenu');
 
-        if (mobileMenuToggle && mainNavigation) {
+        if (mobileMenuToggle && mobileMenu && mobileMenuClose) {
             mobileMenuToggle.addEventListener('click', function() {
-                mainNavigation.classList.toggle('active');
-                this.classList.toggle('active');
+                mobileMenu.classList.toggle('translate-x-full');
+            });
+            
+            mobileMenuClose.addEventListener('click', function() {
+                mobileMenu.classList.add('translate-x-full');
             });
         }
-
-        // Handle dropdown toggles on mobile
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
-                    this.closest('.nav-item').classList.toggle('active');
-                }
-            });
-        });
     });
 </script> 

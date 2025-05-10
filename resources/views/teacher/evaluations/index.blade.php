@@ -3,138 +3,182 @@
 @section('title', 'Evaluations')
 
 @section('content')
-<div class="container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Evaluations Management</h1>
-            <p class="page-subtitle">Manage and track peer evaluations</p>
-        </div>
-        <div class="header-actions">
-            <a href="{{ route('teacher.evaluations.assign') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Assign Evaluations
-            </a>
-            <a href="{{ route('teacher.dashboard') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section with Gradient Background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg mb-8 p-6">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl font-bold text-white mb-2">Evaluations Management</h1>
+                <p class="text-blue-100">Manage and track peer evaluations</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="{{ route('teacher.evaluations.assign') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
+                    <i class="fas fa-plus mr-2"></i>Assign Evaluations
+                </a>
+                <a href="{{ route('teacher.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
-    <div class="content-card">
-        <div class="card-header">
-            <div class="filter-controls">
-                <div class="search-wrapper">
-                    <input type="text" id="evaluationSearch" class="search-input" placeholder="Search evaluations...">
-                    <i class="fas fa-search search-icon"></i>
+    <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+        <div class="border-b border-gray-700 px-6 py-4">
+            <div class="flex flex-col md:flex-row gap-4 items-end mb-6">
+                <div class="flex-1">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="evaluationSearch" 
+                            placeholder="Search evaluations..." 
+                            class="pl-10 pr-4 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-white"
+                        >
+                        <div class="absolute left-3 top-2.5 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="filter-dropdown">
-                    <select id="statusFilter" class="filter-select">
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">In Progress</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                    <label for="statusFilter">Status</label>
+                <div class="w-full md:w-48">
+                    <div class="relative">
+                        <select id="statusFilter" class="pl-3 pr-10 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-white appearance-none">
+                            <option value="all">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
                 
-                <div class="filter-dropdown">
-                    <select id="briefFilter" class="filter-select">
-                        <option value="all">All Briefs</option>
-                        @foreach($briefs ?? [] as $brief)
-                            <option value="{{ $brief->id }}">{{ $brief->title }}</option>
-                        @endforeach
-                    </select>
-                    <label for="briefFilter">Brief</label>
+                <div class="w-full md:w-48">
+                    <div class="relative">
+                        <select id="briefFilter" class="pl-3 pr-10 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full text-white appearance-none">
+                            <option value="all">All Briefs</option>
+                            @foreach($briefs ?? [] as $brief)
+                                <option value="{{ $brief->id }}">{{ $brief->title }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="summary-stats">
-                <div class="stat-item">
-                    <span class="stat-value">{{ $evaluationStats['total'] ?? 0 }}</span>
-                    <span class="stat-label">Total</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-750 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-white">{{ $evaluationStats['total'] ?? 0 }}</div>
+                    <div class="text-sm text-gray-400">Total</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ $evaluationStats['pending'] ?? 0 }}</span>
-                    <span class="stat-label">Pending</span>
+                <div class="bg-gray-750 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-400">{{ $evaluationStats['pending'] ?? 0 }}</div>
+                    <div class="text-sm text-gray-400">Pending</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ $evaluationStats['in_progress'] ?? 0 }}</span>
-                    <span class="stat-label">In Progress</span>
+                <div class="bg-gray-750 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-400">{{ $evaluationStats['in_progress'] ?? 0 }}</div>
+                    <div class="text-sm text-gray-400">In Progress</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-value">{{ $evaluationStats['completed'] ?? 0 }}</span>
-                    <span class="stat-label">Completed</span>
+                <div class="bg-gray-750 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-400">{{ $evaluationStats['completed'] ?? 0 }}</div>
+                    <div class="text-sm text-gray-400">Completed</div>
                 </div>
             </div>
         </div>
         
-        <div class="evaluations-table-container">
-            <table class="evaluations-table">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-700">
                 <thead>
                     <tr>
-                        <th>Evaluator</th>
-                        <th>Student</th>
-                        <th>Brief</th>
-                        <th>Status</th>
-                        <th>Assigned Date</th>
-                        <th>Due Date</th>
-                        <th>Completion Date</th>
-                        <th>Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Evaluator</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Brief</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Assigned Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Due Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Completion Date</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-700">
                     @forelse($evaluations as $evaluation)
-                        <tr data-status="{{ $evaluation->status }}" data-brief="{{ $evaluation->submission->brief_id }}">
-                            <td>
-                                {{ $evaluation->evaluator->username }}
+                        <tr class="hover:bg-gray-750 transition-colors duration-200" data-status="{{ $evaluation->status }}" data-brief="{{ $evaluation->submission->brief_id }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-gray-700 text-gray-400">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-white">{{ $evaluation->evaluator->username }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td>
-                                {{ $evaluation->submission->student->username }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-gray-700 text-gray-400">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-white">{{ $evaluation->submission->student->username }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td>
-                                {{ $evaluation->submission->brief->title }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-white">{{ $evaluation->submission->brief->title }}</div>
                             </td>
-                            <td>
-                                <span class="status-badge {{ $evaluation->status }}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center
+                                    {{ $evaluation->status == 'completed' ? 'bg-green-900/30 text-green-400' : 
+                                       ($evaluation->status == 'in_progress' ? 'bg-blue-900/30 text-blue-400' : 
+                                       'bg-yellow-900/30 text-yellow-400') }}">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-1.5 
+                                        {{ $evaluation->status == 'completed' ? 'bg-green-400' : 
+                                           ($evaluation->status == 'in_progress' ? 'bg-blue-400' : 
+                                           'bg-yellow-400') }}"></span>
                                     {{ ucfirst($evaluation->status) }}
                                 </span>
                             </td>
-                            <td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                                 {{ $evaluation->created_at->format('M d, Y') }}
                             </td>
-                            <td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                                 {{ $evaluation->due_date ? $evaluation->due_date->format('M d, Y') : 'N/A' }}
                             </td>
-                            <td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                                 {{ $evaluation->completed_at ? $evaluation->completed_at->format('M d, Y') : 'N/A' }}
                             </td>
-                            <td class="actions-cell">
-                                <a href="{{ route('teacher.evaluations.show', $evaluation->id) }}" class="btn-icon" title="View Evaluation">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <button type="button" class="btn-icon remind-btn" data-id="{{ $evaluation->id }}" title="Send Reminder">
-                                    <i class="fas fa-bell"></i>
-                                </button>
-                                <form action="{{ route('teacher.evaluations.cancel', $evaluation->id) }}" 
-                                      method="POST" class="d-inline delete-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn-icon delete-btn" title="Delete Evaluation">
-                                        <i class="fas fa-trash"></i>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <div class="flex justify-end space-x-2">
+                                    <a href="{{ route('teacher.evaluations.show', $evaluation->id) }}" class="text-blue-400 hover:text-blue-300 transition-colors p-1">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="text-yellow-400 hover:text-yellow-300 transition-colors p-1 remind-btn" data-id="{{ $evaluation->id }}">
+                                        <i class="fas fa-bell"></i>
                                     </button>
-                                </form>
+                                    <form action="{{ route('teacher.evaluations.cancel', $evaluation->id) }}" 
+                                          method="POST" class="inline-block delete-form">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" class="text-red-400 hover:text-red-300 transition-colors p-1 delete-btn">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty
-                        <tr class="empty-row">
-                            <td colspan="8" class="empty-table">
-                                <div class="empty-state">
-                                    <i class="fas fa-clipboard-check"></i>
-                                    <p>No evaluations found.</p>
-                                    <a href="{{ route('teacher.evaluations.assign') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus"></i> Assign Evaluations
-                                    </a>
+                        <tr>
+                            <td colspan="8" class="px-6 py-16 text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-700 text-gray-500 mb-4">
+                                    <i class="fas fa-clipboard-check text-3xl"></i>
                                 </div>
+                                <p class="text-lg font-medium text-white mb-2">No evaluations found</p>
+                                <p class="text-gray-400 max-w-md mx-auto mb-6">There are no evaluations assigned yet.</p>
+                                <a href="{{ route('teacher.evaluations.assign') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>Assign Evaluations
+                                </a>
                             </td>
                         </tr>
                     @endforelse
@@ -142,384 +186,69 @@
             </table>
         </div>
         
-        <div class="pagination-container">
+        <div class="px-6 py-4 border-t border-gray-700">
             {{ $evaluations->links() }}
         </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Confirm Deletion</h3>
-                <button type="button" class="close-modal">&times;</button>
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Confirm Deletion</h3>
+                <button type="button" class="text-gray-400 hover:text-white close-modal">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this evaluation?</p>
-                <p class="warning">This action cannot be undone.</p>
+            <div class="mb-6">
+                <p class="text-gray-300 mb-2">Are you sure you want to delete this evaluation?</p>
+                <p class="text-red-400 text-sm">This action cannot be undone.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline modal-cancel">Cancel</button>
-                <button type="button" class="btn btn-danger modal-confirm">Delete</button>
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors modal-cancel">Cancel</button>
+                <button type="button" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors modal-confirm">Delete</button>
             </div>
         </div>
     </div>
 
     <!-- Reminder Modal -->
-    <div id="reminderModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Send Reminder</h3>
-                <button type="button" class="close-modal">&times;</button>
+    <div id="reminderModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6 border border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-white">Send Reminder</h3>
+                <button type="button" class="text-gray-400 hover:text-white close-modal">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
-            <div class="modal-body">
-                <p>Send a reminder to the student about this evaluation?</p>
-                <div class="form-group">
-                    <label for="reminderMessage">Custom Message (Optional)</label>
-                    <textarea id="reminderMessage" class="form-control" rows="3" placeholder="Add a personal message..."></textarea>
+            <div class="mb-6">
+                <p class="text-gray-300 mb-4">Send a reminder to the student about this evaluation?</p>
+                <div class="mb-4">
+                    <label for="reminderMessage" class="block text-sm font-medium text-gray-400 mb-2">Custom Message (Optional)</label>
+                    <textarea id="reminderMessage" rows="3" placeholder="Add a personal message..." class="w-full px-3 py-2 rounded-lg bg-gray-700 border border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white"></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline modal-cancel">Cancel</button>
-                <button type="button" class="btn btn-primary reminder-confirm">Send Reminder</button>
+            <div class="flex justify-end space-x-3">
+                <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors modal-cancel">Cancel</button>
+                <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors reminder-confirm">Send Reminder</button>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@section('styles')
-<style>
-    /* Page Layout */
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-    }
-
-    .page-title {
-        font-size: 1.75rem;
-        margin-bottom: 0.25rem;
-        color: var(--secondary-color);
-    }
-
-    .page-subtitle {
-        color: var(--accent-color);
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    /* Content Card */
-    .content-card {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        overflow: hidden;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    /* Filter Controls */
-    .filter-controls {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1.25rem;
-        flex-wrap: wrap;
-    }
-
-    .search-wrapper {
-        position: relative;
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .search-input {
-        padding: 0.65rem 0.75rem;
-        padding-left: 2.5rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(229, 231, 235, 0.2);
-        border-radius: 0.375rem;
-        color: var(--secondary-color);
-        width: 100%;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 0.85rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--accent-color);
-    }
-
-    .filter-dropdown {
-        position: relative;
-    }
-
-    .filter-select {
-        padding: 0.65rem 2.5rem 0.65rem 0.75rem;
-        background-color: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(229, 231, 235, 0.2);
-        border-radius: 0.375rem;
-        color: var(--secondary-color);
-        appearance: none;
-        min-width: 150px;
-        cursor: pointer;
-    }
-
-    .filter-dropdown label {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--accent-color);
-        font-size: 0.75rem;
-        pointer-events: none;
-    }
-
-    /* Summary Stats */
-    .summary-stats {
-        display: flex;
-        gap: 1.5rem;
-        flex-wrap: wrap;
-    }
-
-    .stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--secondary-color);
-    }
-
-    .stat-label {
-        font-size: 0.875rem;
-        color: var(--accent-color);
-    }
-
-    /* Table Styles */
-    .evaluations-table-container {
-        overflow-x: auto;
-    }
-
-    .evaluations-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .evaluations-table th {
-        text-align: left;
-        padding: 1rem 1.25rem;
-        font-weight: 600;
-        color: var(--secondary-color);
-        white-space: nowrap;
-    }
-
-    .evaluations-table td {
-        padding: 1rem 1.25rem;
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-        color: var(--secondary-color);
-    }
-
-    .evaluations-table tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.03);
-    }
-
-    .actions-cell {
-        white-space: nowrap;
-        text-align: right;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 2rem;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .status-badge.pending {
-        background-color: rgba(236, 201, 75, 0.1);
-        color: #ECC94B;
-    }
-
-    .status-badge.in_progress {
-        background-color: rgba(66, 153, 225, 0.1);
-        color: #4299E1;
-    }
-
-    .status-badge.completed {
-        background-color: rgba(72, 187, 120, 0.1);
-        color: #48BB78;
-    }
-
-    /* Empty State */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 3rem 1rem;
-        text-align: center;
-        color: var(--accent-color);
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1.5rem;
-        color: var(--accent-color);
-    }
-
-    .empty-state p {
-        margin-bottom: 1.5rem;
-    }
-
-    /* Pagination */
-    .pagination-container {
-        padding: 1.5rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    /* Button Styles */
-    .btn-icon {
-        background: none;
-        border: none;
-        padding: 0.5rem;
-        margin-left: 0.5rem;
-        font-size: 0.95rem;
-        color: var(--accent-color);
-        cursor: pointer;
-        border-radius: 0.25rem;
-        transition: all 0.2s;
-    }
-
-    .btn-icon:hover {
-        color: var(--primary-color);
-        background-color: rgba(255, 255, 255, 0.05);
-    }
-
-    .remind-btn:hover {
-        color: #ECC94B;
-    }
-
-    .delete-btn:hover {
-        color: #F56565;
-    }
-
-    /* Modal Styles */
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .modal-content {
-        background-color: var(--highlight-color);
-        border-radius: 0.5rem;
-        width: 90%;
-        max-width: 500px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.25rem 1.5rem;
-        border-bottom: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .modal-title {
-        font-size: 1.25rem;
-        color: var(--secondary-color);
-        margin: 0;
-    }
-
-    .close-modal {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: var(--accent-color);
-        cursor: pointer;
-    }
-
-    .modal-body {
-        padding: 1.5rem;
-        color: var(--secondary-color);
-    }
-
-    .modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        padding: 1.25rem 1.5rem;
-        border-top: 1px solid rgba(229, 231, 235, 0.1);
-    }
-
-    .warning {
-        color: #F56565;
-        font-weight: 500;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .page-header {
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .header-actions {
-            width: 100%;
-        }
-
-        .filter-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .summary-stats {
-            justify-content: space-around;
-        }
-    }
-</style>
-@endsection
-
-@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Search functionality
+        // Search and filter functionality
         const searchInput = document.getElementById('evaluationSearch');
         const statusFilter = document.getElementById('statusFilter');
         const briefFilter = document.getElementById('briefFilter');
-        const rows = document.querySelectorAll('.evaluations-table tbody tr:not(.empty-row)');
-
-        function filterTable() {
+        const tableRows = document.querySelectorAll('tbody tr:not([colspan])');
+        
+        function filterEvaluations() {
             const searchTerm = searchInput.value.toLowerCase();
             const statusValue = statusFilter.value;
             const briefValue = briefFilter.value;
             
-            let hasVisibleRows = false;
-            
-            rows.forEach(row => {
+            tableRows.forEach(row => {
                 const rowText = row.textContent.toLowerCase();
                 const rowStatus = row.dataset.status;
                 const rowBrief = row.dataset.brief;
@@ -528,147 +257,107 @@
                 const matchesStatus = statusValue === 'all' || rowStatus === statusValue;
                 const matchesBrief = briefValue === 'all' || rowBrief === briefValue;
                 
-                const shouldShow = matchesSearch && matchesStatus && matchesBrief;
-                
-                row.style.display = shouldShow ? '' : 'none';
-                
-                if (shouldShow) {
-                    hasVisibleRows = true;
+                if (matchesSearch && matchesStatus && matchesBrief) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
                 }
             });
-            
-            // Show empty message if no matches
-            const emptyRow = document.querySelector('.empty-row');
-            if (emptyRow) {
-                emptyRow.style.display = hasVisibleRows ? 'none' : '';
-            }
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', filterTable);
         }
         
-        if (statusFilter) {
-            statusFilter.addEventListener('change', filterTable);
-        }
+        if (searchInput) searchInput.addEventListener('keyup', filterEvaluations);
+        if (statusFilter) statusFilter.addEventListener('change', filterEvaluations);
+        if (briefFilter) briefFilter.addEventListener('change', filterEvaluations);
         
-        if (briefFilter) {
-            briefFilter.addEventListener('change', filterTable);
-        }
-
-        // Delete confirmation modal
+        // Modal functionality
         const deleteModal = document.getElementById('deleteModal');
-        const deleteBtns = document.querySelectorAll('.delete-btn');
-        const modalCancel = document.querySelector('#deleteModal .modal-cancel');
-        const modalConfirm = document.querySelector('#deleteModal .modal-confirm');
-        const closeModalBtn = document.querySelector('#deleteModal .close-modal');
-        let currentDeleteForm = null;
-
-        deleteBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                currentDeleteForm = this.closest('form');
-                deleteModal.style.display = 'flex';
-            });
-        });
-
-        if (modalCancel) {
-            modalCancel.addEventListener('click', function() {
-                deleteModal.style.display = 'none';
-                currentDeleteForm = null;
-            });
-        }
-
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', function() {
-                deleteModal.style.display = 'none';
-                currentDeleteForm = null;
-            });
-        }
-
-        if (modalConfirm) {
-            modalConfirm.addEventListener('click', function() {
-                if (currentDeleteForm) {
-                    currentDeleteForm.submit();
-                }
-            });
-        }
-
-        // Reminder modal
         const reminderModal = document.getElementById('reminderModal');
+        const deleteBtns = document.querySelectorAll('.delete-btn');
         const remindBtns = document.querySelectorAll('.remind-btn');
-        const reminderCancel = document.querySelector('#reminderModal .modal-cancel');
-        const reminderConfirm = document.querySelector('#reminderModal .reminder-confirm');
-        const closeReminderBtn = document.querySelector('#reminderModal .close-modal');
-        let currentReminderEvalId = null;
-
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const modalCancelBtns = document.querySelectorAll('.modal-cancel');
+        
+        let currentForm = null;
+        let currentEvaluationId = null;
+        
+        function openModal(modal) {
+            modal.classList.remove('hidden');
+        }
+        
+        function closeModal(modal) {
+            modal.classList.add('hidden');
+        }
+        
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentForm = this.closest('form');
+                openModal(deleteModal);
+            });
+        });
+        
         remindBtns.forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                currentReminderEvalId = this.dataset.id;
-                reminderModal.style.display = 'flex';
+            btn.addEventListener('click', function() {
+                currentEvaluationId = this.dataset.id;
+                openModal(reminderModal);
             });
         });
-
-        if (reminderCancel) {
-            reminderCancel.addEventListener('click', function() {
-                reminderModal.style.display = 'none';
-                currentReminderEvalId = null;
+        
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                closeModal(this.closest('.fixed'));
             });
-        }
-
-        if (closeReminderBtn) {
-            closeReminderBtn.addEventListener('click', function() {
-                reminderModal.style.display = 'none';
-                currentReminderEvalId = null;
+        });
+        
+        modalCancelBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                closeModal(this.closest('.fixed'));
             });
-        }
-
-        if (reminderConfirm) {
-            reminderConfirm.addEventListener('click', function() {
-                if (currentReminderEvalId) {
-                    const message = document.getElementById('reminderMessage').value;
-                    
-                    // Send reminder via AJAX
-                    fetch(`/teacher/evaluations/${currentReminderEvalId}/remind`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ message: message })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Reminder sent successfully!');
-                        } else {
-                            alert('Failed to send reminder.');
-                        }
-                        reminderModal.style.display = 'none';
-                        currentReminderEvalId = null;
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
-                        reminderModal.style.display = 'none';
-                        currentReminderEvalId = null;
-                    });
+        });
+        
+        // Delete confirmation
+        const confirmDeleteBtn = document.querySelector('.modal-confirm');
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (currentForm) {
+                    currentForm.submit();
                 }
+                closeModal(deleteModal);
             });
         }
-
-        // Close modals when clicking outside
-        window.addEventListener('click', function(e) {
-            if (e.target === deleteModal) {
-                deleteModal.style.display = 'none';
-                currentDeleteForm = null;
-            }
-            if (e.target === reminderModal) {
-                reminderModal.style.display = 'none';
-                currentReminderEvalId = null;
-            }
-        });
+        
+        // Reminder confirmation
+        const confirmReminderBtn = document.querySelector('.reminder-confirm');
+        if (confirmReminderBtn) {
+            confirmReminderBtn.addEventListener('click', function() {
+                const message = document.getElementById('reminderMessage').value;
+                
+                // Send reminder via AJAX
+                fetch(`/teacher/evaluations/${currentEvaluationId}/remind`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success notification
+                        alert('Reminder sent successfully!');
+                    } else {
+                        // Show error notification
+                        alert('Failed to send reminder: ' + data.message);
+                    }
+                    closeModal(reminderModal);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while sending the reminder.');
+                    closeModal(reminderModal);
+                });
+            });
+        }
     });
 </script>
 @endsection 
