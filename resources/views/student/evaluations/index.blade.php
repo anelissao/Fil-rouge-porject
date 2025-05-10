@@ -12,7 +12,7 @@
                 <p class="text-blue-100">Manage and complete your assigned peer evaluations</p>
             </div>
             <div>
-                <a href="{{ route('student.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
+                <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/20">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
                 </a>
             </div>

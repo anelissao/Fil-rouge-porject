@@ -23,13 +23,13 @@ class DashboardController extends Controller
         $user = Auth::user();
         
         // Get total number of submissions made by the student
-        $totalSubmissions = Submission::where('user_id', $user->id)->count();
+        $totalSubmissions = Submission::where('student_id', $user->id)->count();
         
         // Get pending submissions (briefs where the student hasn't submitted yet)
-        $pendingSubmissions = Brief::wherePublished(true)
-            ->where('end_date', '>=', now())
+        $pendingSubmissions = Brief::where('status', 'published')
+            ->where('deadline', '>=', now())
             ->whereDoesntHave('submissions', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('student_id', $user->id);
             })
             ->count();
         
@@ -40,20 +40,20 @@ class DashboardController extends Controller
         
         // Get evaluations received for the student's submissions
         $receivedEvaluations = Evaluation::whereHas('submission', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('student_id', $user->id);
             })
             ->where('status', 'completed')
             ->count();
         
         // Get active briefs for the student
-        $activeBriefs = Brief::wherePublished(true)
-            ->where('end_date', '>=', now())
+        $activeBriefs = Brief::where('status', 'published')
+            ->where('deadline', '>=', now())
             ->latest('created_at')
             ->limit(5)
             ->get()
             ->map(function($brief) use ($user) {
                 $brief->hasSubmitted = $brief->submissions()
-                    ->where('user_id', $user->id)
+                    ->where('student_id', $user->id)
                     ->exists();
                 return $brief;
             });
@@ -61,18 +61,18 @@ class DashboardController extends Controller
         // Get evaluations that the student needs to complete
         $evaluations = Evaluation::where('evaluator_id', $user->id)
             ->where('status', '!=', 'completed')
-            ->with(['submission.user', 'submission.brief'])
+            ->with(['submission.student', 'submission.brief'])
             ->latest('created_at')
             ->limit(5)
             ->get()
             ->map(function($evaluation) {
-                $evaluation->is_overdue = $evaluation->due_date && $evaluation->due_date->isPast();
+                $evaluation->is_overdue = $evaluation->due_at && $evaluation->due_at->isPast();
                 return $evaluation;
             });
         
         // Get evaluations that the student has received
         $receivedEvaluationsList = Evaluation::whereHas('submission', function($query) use ($user) {
-                $query->where('user_id', $user->id);
+                $query->where('student_id', $user->id);
             })
             ->where('status', 'completed')
             ->with(['evaluator', 'submission.brief'])

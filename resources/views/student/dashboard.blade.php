@@ -1,282 +1,246 @@
 @extends('layouts.app')
 
+@section('title', 'Student Dashboard')
+
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <h1 class="text-3xl font-bold mb-2">Dashboard</h1>
-    <p class="text-gray-600 mb-6">Welcome back, {{ Auth::user()->first_name }}!</p>
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section with Gradient Background -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg mb-8 p-6">
+        <h1 class="text-3xl font-bold text-white mb-2">Dashboard</h1>
+        <p class="text-blue-100">Welcome back, {{ Auth::user()->first_name }}!</p>
+    </div>
 
     <!-- Summary Statistics -->
-    <div class="stats-grid mb-6">
-        <div class="stat-card bg-blue-100">
-            <div class="stat-icon">
-                <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $totalSubmissions }}</div>
-                <div class="stat-label">Total Submissions</div>
-            </div>
-        </div>
-        <div class="stat-card bg-green-100">
-            <div class="stat-icon">
-                <i class="fas fa-clipboard-check"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $pendingSubmissions }}</div>
-                <div class="stat-label">Pending Submissions</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700 p-5 transform hover:scale-[1.02] transition-all duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-lg bg-blue-900/30 text-blue-400">
+                    <i class="fas fa-file-alt text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-white">{{ $totalSubmissions }}</div>
+                    <div class="text-sm text-gray-400">Total Submissions</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card bg-yellow-100">
-            <div class="stat-icon">
-                <i class="fas fa-tasks"></i>
-            </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $pendingEvaluations }}</div>
-                <div class="stat-label">Pending Evaluations</div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700 p-5 transform hover:scale-[1.02] transition-all duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-lg bg-green-900/30 text-green-400">
+                    <i class="fas fa-clipboard-check text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-white">{{ $pendingSubmissions }}</div>
+                    <div class="text-sm text-gray-400">Pending Submissions</div>
+                </div>
             </div>
         </div>
-        <div class="stat-card bg-purple-100">
-            <div class="stat-icon">
-                <i class="fas fa-award"></i>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700 p-5 transform hover:scale-[1.02] transition-all duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-lg bg-yellow-900/30 text-yellow-400">
+                    <i class="fas fa-tasks text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-white">{{ $pendingEvaluations }}</div>
+                    <div class="text-sm text-gray-400">Pending Evaluations</div>
+                </div>
             </div>
-            <div class="stat-content">
-                <div class="stat-value">{{ $receivedEvaluations }}</div>
-                <div class="stat-label">Received Evaluations</div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700 p-5 transform hover:scale-[1.02] transition-all duration-300">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 h-12 w-12 flex items-center justify-center rounded-lg bg-purple-900/30 text-purple-400">
+                    <i class="fas fa-award text-2xl"></i>
+                </div>
+                <div class="ml-4">
+                    <div class="text-2xl font-bold text-white">{{ $receivedEvaluations }}</div>
+                    <div class="text-sm text-gray-400">Received Evaluations</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="dashboard-grid">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Active Briefs Section -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2 class="text-xl font-semibold">Active Briefs</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Active Briefs</h2>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 @if(count($activeBriefs) > 0)
-                    <ul class="divide-y divide-gray-200">
+                    <ul class="divide-y divide-gray-700">
                         @foreach($activeBriefs as $brief)
-                            <li class="py-3">
+                            <li class="py-4">
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <h3 class="font-medium">{{ $brief->title }}</h3>
-                                        <p class="text-sm text-gray-500">
-                                            Due: {{ $brief->end_date->format('M d, Y') }}
+                                        <h3 class="font-medium text-white">{{ $brief->title }}</h3>
+                                        <p class="text-sm text-gray-400">
+                                            Due: {{ $brief->deadline->format('M d, Y') }}
                                         </p>
                                     </div>
                                     <div class="flex space-x-2">
                                         @if($brief->hasSubmitted)
-                                            <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Submitted</span>
+                                            <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-green-900/30 text-green-400">
+                                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-green-400"></span>
+                                                Submitted
+                                            </span>
                                         @else
-                                            <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Pending</span>
+                                            <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-yellow-900/30 text-yellow-400">
+                                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-yellow-400"></span>
+                                                Pending
+                                            </span>
                                         @endif
-                                        <a href="{{ route('briefs.show', $brief->id) }}" class="text-blue-600 hover:underline text-sm">View</a>
+                                        <a href="{{ route('briefs.show', $brief->id) }}" class="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">View</a>
                                     </div>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
                 @else
-                    <p class="text-gray-500 italic py-4">No active briefs available at the moment.</p>
+                    <div class="py-8 text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-700 text-gray-500 mb-3">
+                            <i class="fas fa-book text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">No active briefs available at the moment.</p>
+                    </div>
                 @endif
             </div>
-            <div class="card-footer">
-                <a href="{{ route('briefs.index') }}" class="text-blue-600 hover:underline">View all briefs</a>
+            <div class="border-t border-gray-700 px-6 py-3">
+                <a href="{{ route('briefs.index') }}" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center">
+                    <span>View all briefs</span>
+                    <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                </a>
             </div>
         </div>
 
         <!-- My Evaluations Section -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2 class="text-xl font-semibold">My Evaluations</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">My Evaluations</h2>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 @if(count($evaluations) > 0)
-                    <ul class="divide-y divide-gray-200">
+                    <ul class="divide-y divide-gray-700">
                         @foreach($evaluations as $evaluation)
-                            <li class="py-3">
+                            <li class="py-4">
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <h3 class="font-medium">{{ $evaluation->submission->brief->title }}</h3>
-                                        <p class="text-sm text-gray-500">
-                                            Student: {{ $evaluation->submission->user->username }}
+                                        <h3 class="font-medium text-white">{{ $evaluation->submission->brief->title }}</h3>
+                                        <p class="text-sm text-gray-400">
+                                            Student: {{ $evaluation->submission->student->username }}
                                         </p>
                                     </div>
                                     <div class="flex space-x-2">
                                         @if($evaluation->is_overdue)
-                                            <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Overdue</span>
+                                            <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-red-900/30 text-red-400">
+                                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-red-400"></span>
+                                                Overdue
+                                            </span>
                                         @else
-                                            <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded">Pending</span>
+                                            <span class="px-2.5 py-1 text-xs font-medium rounded-full inline-flex items-center bg-yellow-900/30 text-yellow-400">
+                                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 bg-yellow-400"></span>
+                                                Pending
+                                            </span>
                                         @endif
-                                        <a href="{{ route('student.evaluations.edit', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">Evaluate</a>
+                                        <a href="{{ route('student.evaluations.edit', $evaluation->id) }}" class="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Evaluate</a>
                                     </div>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
                 @else
-                    <p class="text-gray-500 italic py-4">No evaluations assigned to you at the moment.</p>
+                    <div class="py-8 text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-700 text-gray-500 mb-3">
+                            <i class="fas fa-clipboard-check text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">No evaluations assigned to you at the moment.</p>
+                    </div>
                 @endif
             </div>
-            <div class="card-footer">
-                <a href="{{ route('student.evaluations.index') }}" class="text-blue-600 hover:underline">View all evaluations</a>
+            <div class="border-t border-gray-700 px-6 py-3">
+                <a href="{{ route('student.evaluations.index') }}" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center">
+                    <span>View all evaluations</span>
+                    <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                </a>
             </div>
         </div>
 
         <!-- My Results Section -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2 class="text-xl font-semibold">My Results</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">My Results</h2>
             </div>
-            <div class="card-body">
+            <div class="p-6">
                 @if(count($receivedEvaluationsList) > 0)
-                    <ul class="divide-y divide-gray-200">
+                    <ul class="divide-y divide-gray-700">
                         @foreach($receivedEvaluationsList as $evaluation)
-                            <li class="py-3">
+                            <li class="py-4">
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <h3 class="font-medium">{{ $evaluation->submission->brief->title }}</h3>
-                                        <p class="text-sm text-gray-500">
+                                        <h3 class="font-medium text-white">{{ $evaluation->submission->brief->title }}</h3>
+                                        <p class="text-sm text-gray-400">
                                             Evaluated by: {{ $evaluation->evaluator->username }}
                                         </p>
                                     </div>
                                     <div>
-                                        <a href="{{ route('student.evaluations.show', $evaluation->id) }}" class="text-blue-600 hover:underline text-sm">View Results</a>
+                                        <a href="{{ route('student.evaluations.show', $evaluation->id) }}" class="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">View Results</a>
                                     </div>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
                 @else
-                    <p class="text-gray-500 italic py-4">No evaluation results received yet.</p>
+                    <div class="py-8 text-center">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-700 text-gray-500 mb-3">
+                            <i class="fas fa-award text-xl"></i>
+                        </div>
+                        <p class="text-gray-400">No evaluation results received yet.</p>
+                    </div>
                 @endif
             </div>
-            <div class="card-footer">
-                <a href="{{ route('student.evaluations.index') }}" class="text-blue-600 hover:underline">View all results</a>
+            <div class="border-t border-gray-700 px-6 py-3">
+                <a href="{{ route('student.evaluations.index') }}" class="text-blue-400 hover:text-blue-300 transition-colors flex items-center">
+                    <span>View all results</span>
+                    <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                </a>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2 class="text-xl font-semibold">Quick Actions</h2>
+        <div class="bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-700">
+            <div class="border-b border-gray-700 px-6 py-4">
+                <h2 class="text-xl font-bold text-white">Quick Actions</h2>
             </div>
-            <div class="card-body">
-                <div class="grid grid-cols-1 gap-3">
-                    <a href="{{ route('briefs.index') }}" class="action-link">
-                        <i class="fas fa-book"></i>
-                        <span>View All Briefs</span>
+            <div class="p-6">
+                <div class="grid grid-cols-1 gap-4">
+                    <a href="{{ route('briefs.index') }}" class="flex items-center p-4 bg-gray-750 rounded-lg hover:bg-gray-700 transition-colors group">
+                        <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-blue-900/30 text-blue-400 group-hover:bg-blue-800/50 transition-colors">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="ml-4 text-white">View All Briefs</div>
                     </a>
-                    <a href="{{ route('student.submissions.index') }}" class="action-link">
-                        <i class="fas fa-file-upload"></i>
-                        <span>My Submissions</span>
+                    <a href="{{ route('student.submissions.index') }}" class="flex items-center p-4 bg-gray-750 rounded-lg hover:bg-gray-700 transition-colors group">
+                        <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-green-900/30 text-green-400 group-hover:bg-green-800/50 transition-colors">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="ml-4 text-white">My Submissions</div>
                     </a>
-                    <a href="{{ route('student.evaluations.index') }}" class="action-link">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>My Evaluations</span>
+                    <a href="{{ route('student.evaluations.index') }}" class="flex items-center p-4 bg-gray-750 rounded-lg hover:bg-gray-700 transition-colors group">
+                        <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-yellow-900/30 text-yellow-400 group-hover:bg-yellow-800/50 transition-colors">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="ml-4 text-white">My Evaluations</div>
                     </a>
-                    <a href="{{ route('student.evaluations.index') }}" class="action-link">
-                        <i class="fas fa-award"></i>
-                        <span>View My Results</span>
+                    <a href="{{ route('student.evaluations.index') }}" class="flex items-center p-4 bg-gray-750 rounded-lg hover:bg-gray-700 transition-colors group">
+                        <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-lg bg-purple-900/30 text-purple-400 group-hover:bg-purple-800/50 transition-colors">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <div class="ml-4 text-white">View My Results</div>
                     </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        gap: 1rem;
-    }
-    
-    @media (min-width: 640px) {
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (min-width: 1024px) {
-        .stats-grid {
-            grid-template-columns: repeat(4, 1fr);
-        }
-    }
-    
-    .stat-card {
-        display: flex;
-        align-items: center;
-        padding: 1.25rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .stat-icon {
-        font-size: 1.5rem;
-        margin-right: 1rem;
-        color: rgba(0, 0, 0, 0.7);
-    }
-    
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .stat-label {
-        font-size: 0.875rem;
-        color: rgba(0, 0, 0, 0.6);
-    }
-    
-    .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(1, 1fr);
-        gap: 1.5rem;
-    }
-    
-    @media (min-width: 1024px) {
-        .dashboard-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    .dashboard-card {
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-    
-    .card-header {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        background-color: rgba(0, 0, 0, 0.01);
-    }
-    
-    .card-body {
-        padding: 1.25rem;
-    }
-    
-    .card-footer {
-        padding: 0.75rem 1.25rem;
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
-        background-color: rgba(0, 0, 0, 0.01);
-    }
-    
-    .action-link {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        background-color: rgba(0, 0, 0, 0.03);
-        border-radius: 0.375rem;
-        transition: all 0.2s;
-    }
-    
-    .action-link:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-    
-    .action-link i {
-        margin-right: 0.75rem;
-    }
-</style>
 @endsection 

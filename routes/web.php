@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 // Public routes
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
     return view('home');
 })->name('home');
 
@@ -34,9 +37,18 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 
 // Protected Routes
 Route::middleware(['auth'])->group(function () {
-    // Dashboard
+    // Dashboard - redirect based on role
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $user = Auth::user();
+        if ($user->role === 'student') {
+            return redirect()->route('student.dashboard');
+        } elseif ($user->role === 'teacher') {
+            return redirect()->route('teacher.dashboard');
+        } elseif ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } else {
+            return view('dashboard');
+        }
     })->name('dashboard');
 
     // User profile
