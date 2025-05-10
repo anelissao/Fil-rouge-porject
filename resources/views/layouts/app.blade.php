@@ -11,10 +11,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
     <style>
         :root {
             --primary-color: #1E90FF;
@@ -53,13 +55,15 @@
         }
 
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem 1rem;
-            border-radius: 0.25rem;
+            border-radius: 0.375rem;
             text-decoration: none;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
+            transition: all 0.3s ease;
         }
 
         .btn-primary {
@@ -70,6 +74,7 @@
 
         .btn-primary:hover {
             background-color: var(--highlight-color);
+            transform: translateY(-1px);
         }
 
         .btn-outline {
@@ -85,14 +90,16 @@
 
         .card {
             background-color: var(--highlight-color);
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(229, 231, 235, 0.1);
         }
 
         .section-title {
             font-size: 1.5rem;
+            font-weight: 600;
             margin-bottom: 1rem;
             color: var(--secondary-color);
             border-bottom: 2px solid var(--primary-color);
@@ -118,13 +125,15 @@
 
     @yield('styles')
 </head>
-<body class="font-sans antialiased">
+<body>
     <!-- Header -->
     @include('layouts.partials.header')
 
     <!-- Page Content -->
-    <main>
-        @yield('content')
+    <main class="main-content">
+        <div class="container">
+            @yield('content')
+        </div>
     </main>
 
     <!-- Footer -->
