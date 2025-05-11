@@ -47,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
         } elseif ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } else {
-            return view('dashboard');
+        return view('dashboard');
         }
     })->name('dashboard');
 
