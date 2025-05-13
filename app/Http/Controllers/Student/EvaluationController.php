@@ -87,11 +87,17 @@ class EvaluationController extends Controller
                 ->with('error', 'This evaluation has already been completed and cannot be edited.');
         }
         
-        // Get existing answers (if any)
-        $existingAnswers = $evaluation->answers()
-            ->get()
-            ->keyBy('brief_criteria_id');
-            
+        // Get existing answers (if any) and organize by criteria_id for easier access in the view
+        $existingAnswers = [];
+        $evaluationAnswers = $evaluation->answers()->with('task.criteria')->get();
+
+        foreach ($evaluationAnswers as $answer) {
+            if ($answer->task && $answer->task->criteria) {
+                $criteriaId = $answer->task->criteria->id;
+                $existingAnswers[$criteriaId] = $answer;
+            }
+        }
+        
         return view('student.evaluations.edit', compact('evaluation', 'existingAnswers'));
     }
     
@@ -104,9 +110,20 @@ class EvaluationController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Log the entire request for debugging
+        \Log::info('Evaluation Update Request', [
+            'all' => $request->all(),
+            'is_complete' => $request->input('is_complete'),
+            'method' => $request->method(),
+            'path' => $request->path(),
+        ]);
+
         $student = Auth::user();
         
         if (!$student->isStudent()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['error' => 'You must be a student to access this page.'], 403);
+            }
             return redirect('/')->with('error', 'You must be a student to access this page.');
         }
         
@@ -117,6 +134,9 @@ class EvaluationController extends Controller
             
         // Don't allow editing completed evaluations
         if ($evaluation->status === 'completed') {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['error' => 'This evaluation has already been completed and cannot be edited.'], 403);
+            }
             return redirect()->route('student.evaluations.show', $evaluation->id)
                 ->with('error', 'This evaluation has already been completed and cannot be edited.');
         }
@@ -135,27 +155,41 @@ class EvaluationController extends Controller
         
         $validated = $request->validate($rules);
         
+        // Log validated data
+        \Log::info('Validated data', [
+            'validated' => $validated,
+        ]);
+        
         // Begin database transaction
         \DB::beginTransaction();
         
         try {
             // Update or create answers for each criterion
             foreach ($validated['criteria'] as $criterionId => $data) {
-                // Check if an answer for this criterion already exists
+                // First, ensure there's a task for this criterion
+                $task = \App\Models\BriefTask::firstOrCreate(
+                    ['criteria_id' => $criterionId],
+                    [
+                        'description' => 'Automatically created task',
+                        'order' => 1
+                    ]
+                );
+                
+                // Check if an answer for this task already exists
                 $answer = EvaluationAnswer::updateOrCreate(
                     [
                         'evaluation_id' => $evaluation->id,
-                        'brief_criteria_id' => $criterionId,
+                        'task_id' => $task->id,  // Use the task ID, not the criterion ID
                     ],
                     [
-                        'is_valid' => $data['valid'],
+                        'response' => $data['valid'] == 1, // Make sure it's a boolean true/false
                         'comment' => $data['comment'] ?? null,
                     ]
                 );
             }
             
             // Update the evaluation status if the form is being submitted (not saved as draft)
-            if (isset($validated['is_complete']) && $validated['is_complete']) {
+            if ($request->has('is_complete') && $request->input('is_complete') == '1') {
                 $evaluation->status = 'completed';
                 $evaluation->completed_at = Carbon::now();
                 
@@ -168,6 +202,7 @@ class EvaluationController extends Controller
                         [
                             'content' => $validated['overall_feedback'],
                             'created_by' => $student->id,
+                            'rating' => 5, // Add a default rating between 1-5
                         ]
                     );
                 }
@@ -179,16 +214,50 @@ class EvaluationController extends Controller
             
             \DB::commit();
             
-            if (isset($validated['is_complete']) && $validated['is_complete']) {
-                return redirect()->route('student.evaluations.show', $evaluation->id)
-                    ->with('success', 'Evaluation has been completed successfully!');
+            // Log the status of what's happening
+            \Log::info('Evaluation update completed', [
+                'is_complete' => $request->input('is_complete'),
+                'status' => $evaluation->status
+            ]);
+            
+            // Check if AJAX request
+            if ($request->ajax() || $request->wantsJson()) {
+                if ($request->input('is_complete') == '1') {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Evaluation has been completed successfully!',
+                        'redirect' => route('student.evaluations.show', $evaluation->id)
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Your progress has been saved.'
+                    ]);
+                }
             } else {
-                return redirect()->route('student.evaluations.edit', $evaluation->id)
-                    ->with('success', 'Your progress has been saved.');
+                // Standard redirect response
+                if ($request->input('is_complete') == '1') {
+                    return redirect()->route('student.evaluations.show', $evaluation->id)
+                        ->with('success', 'Evaluation has been completed successfully!');
+                } else {
+                    return redirect()->route('student.evaluations.edit', $evaluation->id)
+                        ->with('success', 'Your progress has been saved.');
+                }
             }
         } catch (\Exception $e) {
             \DB::rollBack();
-            return back()->withInput()->with('error', 'An error occurred while saving the evaluation. Please try again.');
+            \Log::error('Evaluation update error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'An error occurred while saving the evaluation: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->withInput()->with('error', 'An error occurred while saving the evaluation: ' . $e->getMessage());
         }
     }
     
@@ -212,14 +281,14 @@ class EvaluationController extends Controller
                       ->where('evaluator_id', $student->id);
             })
             ->orWhereHas('submission', function ($query) use ($student, $id) {
-                $query->where('evaluation_id', $id)
-                      ->where('student_id', $student->id);
+                $query->where('student_id', $student->id)
+                      ->where('evaluations.id', $id);
             })
             ->with([
                 'submission.brief',
                 'submission.student:id,username,first_name,last_name',
                 'evaluator:id,username,first_name,last_name',
-                'answers.criterion',
+                'answers.task.criteria',
                 'feedback'
             ])
             ->firstOrFail();
